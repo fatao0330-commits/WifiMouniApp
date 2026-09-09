@@ -1,0 +1,1 @@
+"\"{\\n  \\\"name\\\": \\\"wifi-mouni-functions\\\",\\n  \\\"description\\\": \\\"Cloud Functions pour WiFi Mouni\\\",\\n  \\\"main\\\": \\\"index.js\\\",\\n  \\\"engines\\\": {\\n    \\\"node\\\": \\\"20\\\"\\n  },\\n  \\\"dependencies\\\": {\\n    \\\"firebase-admin\\\": \\\"^13.0.0\\\",\\n    \\\"firebase-functions\\\": \\\"^6.0.0\\\"\\n  },\\n  \\\"private\\\": true\\n}\""

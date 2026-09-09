@@ -1,0 +1,46 @@
+{
+  "@@locale": "en",
+
+  "appName": "WiFi Mouni",
+
+  "home": "Home",
+  "contact": "Contact",
+  "history": "History",
+  "profile": "Profile",
+  "settings": "Settings",
+
+  "recharge": "Top up",
+  "buySubscription": "Buy subscription",
+  "myQrCode": "My QR Code",
+  "scanQrCode": "Scan QR Code",
+
+  "security": "Security",
+  "createPin": "Create my PIN",
+  "changePin": "Change PIN",
+  "fingerprint": "Fingerprint",
+  "faceRecognition": "Face recognition",
+
+  "preferences": "Preferences",
+  "language": "Language",
+  "french": "French",
+  "english": "English",
+  "notifications": "Notifications",
+  "notificationsEnabled": "Notifications enabled",
+  "notificationsDisabled": "Notifications disabled",
+  "darkMode": "Dark mode",
+  "darkModeEnabled": "Dark mode enabled",
+  "darkModeDisabled": "Dark mode disabled",
+
+  "account": "Account",
+  "privacyPolicy": "Privacy policy",
+  "terms": "Terms of use",
+  "support": "Support",
+  "about": "About",
+  "logout": "Log out",
+
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "continueText": "Continue",
+  "close": "Close"
+}

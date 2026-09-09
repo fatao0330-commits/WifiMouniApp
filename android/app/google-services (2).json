@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "661243021438",
+    "project_id": "wifi-mouni",
+    "storage_bucket": "wifi-mouni.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:661243021438:android:fc3287d62d312ba6e7b02f",
+        "android_client_info": {
+          "package_name": "com.wifi.mouni"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCCFEa4uqRyzecVz1-wI_9nE1UMGNgg1iE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
