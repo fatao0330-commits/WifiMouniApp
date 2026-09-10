@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'auth_service.dart';
 import 'language_selector.dart';
 import 'localization.dart';
 import 'register_page.dart';
@@ -34,6 +35,7 @@ class _AuthFormState extends State<_AuthForm> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -85,10 +87,22 @@ class _AuthFormState extends State<_AuthForm> {
         ),
         const SizedBox(height: 24),
         FilledButton(
-          onPressed: () {
-            if (_formKey.currentState!.validate()) FocusScope.of(context).unfocus();
+          onPressed: _isSubmitting
+              ? null
+              : () async {
+                  if (!_formKey.currentState!.validate()) return;
+                  FocusScope.of(context).unfocus();
+                  setState(() => _isSubmitting = true);
+                  final isValid = await AuthService.login(email: _emailController.text, password: _passwordController.text);
+                  if (!mounted) return;
+                  setState(() => _isSubmitting = false);
+                  if (!isValid) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.text('loginFailed'))));
+                    return;
+                  }
+                  Navigator.of(context).popUntil((route) => route.isFirst);
           },
-          child: Text(strings.text('continue')),
+          child: _isSubmitting ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : Text(strings.text('continue')),
         ),
         const SizedBox(height: 18),
         Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text(widget.alternateText), TextButton(onPressed: widget.onAlternate, child: Text(widget.alternateLabel))]),
