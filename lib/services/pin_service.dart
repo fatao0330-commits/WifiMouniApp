@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PinService {
   PinService();
@@ -27,6 +28,8 @@ class PinService {
   DocumentReference<Map<String, dynamic>> get _userDoc {
     return _firestore.collection('users').doc(_uid);
   }
+
+  String get _pinConfiguredKey => 'pin_configured_$_uid';
 
   // ==========================================================
   // TÉLÉPHONE
@@ -72,9 +75,13 @@ class PinService {
   // ==========================================================
 
   Future<bool> hasPin() async {
+    final preferences = await SharedPreferences.getInstance();
+    final cached = preferences.getBool(_pinConfiguredKey);
+    if (cached != null) return cached;
     final doc = await _userDoc.get();
-
-    return doc.exists && doc.data()?['pinConfigured'] == true;
+    final configured = doc.exists && doc.data()?['pinConfigured'] == true;
+    await preferences.setBool(_pinConfiguredKey, configured);
+    return configured;
   }
 
   // ==========================================================
@@ -96,6 +103,8 @@ class PinService {
       await callable.call({
         'pin': value,
       });
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_pinConfiguredKey, true);
     } on FirebaseFunctionsException catch (e) {
       throw Exception(
         e.message ?? 'Impossible de créer le code PIN.',
@@ -310,6 +319,8 @@ class PinService {
         'resetToken': token,
         'newPin': pin,
       });
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_pinConfiguredKey, true);
     } on FirebaseFunctionsException catch (e) {
       throw Exception(
         e.message ??

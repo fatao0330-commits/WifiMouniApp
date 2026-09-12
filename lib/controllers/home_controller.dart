@@ -13,6 +13,6 @@ class HomeController {
       return Stream.value(null);
     }
 
-    return _walletService.getWallet(user.uid);
+    return _walletService.getWallet();
   }
 }

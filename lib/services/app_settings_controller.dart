@@ -1,153 +1,87 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'settings_service.dart';
 
-/// ============================================================
-/// CONTRÔLEUR GLOBAL DES PARAMÈTRES DE WIFI MOUNI
-/// ============================================================
-///
-/// Ce contrôleur permet à toute l'application d'utiliser les
-/// mêmes paramètres :
-///
-/// 🇫🇷 / 🇬🇧 Langue
-/// 🌙 Mode sombre
-/// 🔔 Notifications
-///
-/// Le contrôleur est utilisé par main.dart pour reconstruire
-/// automatiquement l'application lorsque les paramètres changent.
 class AppSettingsController extends ChangeNotifier {
-  AppSettingsController({
-    required String language,
-    required bool darkMode,
-    required bool notifications,
-  })  : _language = language == "en" ? "en" : "fr",
+  AppSettingsController({required String language, required bool darkMode, required bool notifications})
+      : _language = language == 'en' ? 'en' : 'fr',
         _darkMode = darkMode,
         _notifications = notifications;
 
-  final SettingsService _settingsService = SettingsService();
+  static const _languageKey = 'settings_language';
+  static const _darkModeKey = 'settings_dark_mode';
+  static const _notificationsKey = 'settings_notifications';
 
+  final SettingsService _settingsService = SettingsService();
   String _language;
   bool _darkMode;
   bool _notifications;
 
-  // ============================================================
-  // GETTERS
-  // ============================================================
-
-  /// Langue actuelle : "fr" ou "en".
   String get language => _language;
-
-  /// Indique si le mode sombre est activé.
   bool get darkMode => _darkMode;
-
-  /// Indique si les notifications sont activées.
   bool get notifications => _notifications;
-
-  /// Locale Flutter utilisée par MaterialApp.
-  Locale get locale {
-    return _language == "en"
-        ? const Locale("en")
-        : const Locale("fr");
-  }
-
-  /// Mode du thème Flutter.
-  ThemeMode get themeMode {
-    return _darkMode
-        ? ThemeMode.dark
-        : ThemeMode.light;
-  }
-
-  // ============================================================
-  // CHANGER LA LANGUE
-  // ============================================================
+  Locale get locale => Locale(_language);
+  ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
 
   Future<void> setLanguage(String language) async {
-    final newLanguage =
-        language == "en" ? "en" : "fr";
-
-    if (_language == newLanguage) {
-      return;
-    }
-
-    // Enregistrer dans Firestore.
-    await _settingsService.setLanguage(
-      newLanguage,
-    );
-
-    // Modifier immédiatement l'application.
+    final newLanguage = language == 'en' ? 'en' : 'fr';
+    if (_language == newLanguage) return;
     _language = newLanguage;
-
     notifyListeners();
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setString(_languageKey, newLanguage);
+    try {
+      await _settingsService.setLanguage(newLanguage);
+    } catch (error) {
+      debugPrint('Synchronisation de la langue impossible : $error');
+    }
   }
-
-  // ============================================================
-  // MODE SOMBRE
-  // ============================================================
 
   Future<void> setDarkMode(bool enabled) async {
-    if (_darkMode == enabled) {
-      return;
-    }
-
-    // Enregistrer dans Firestore.
-    await _settingsService.setDarkModeEnabled(
-      enabled,
-    );
-
-    // Modifier immédiatement l'application.
+    if (_darkMode == enabled) return;
     _darkMode = enabled;
-
     notifyListeners();
-  }
-
-  // ============================================================
-  // NOTIFICATIONS
-  // ============================================================
-
-  Future<void> setNotifications(
-    bool enabled,
-  ) async {
-    if (_notifications == enabled) {
-      return;
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_darkModeKey, enabled);
+    try {
+      await _settingsService.setDarkModeEnabled(enabled);
+    } catch (error) {
+      debugPrint('Synchronisation du mode sombre impossible : $error');
     }
-
-    // Enregistrer dans Firestore.
-    await _settingsService
-        .setNotificationsEnabled(
-      enabled,
-    );
-
-    // Modifier immédiatement l'application.
-    _notifications = enabled;
-
-    notifyListeners();
   }
 
-  // ============================================================
-  // CHARGER LES PARAMÈTRES DEPUIS FIRESTORE
-  // ============================================================
+  Future<void> setNotifications(bool enabled) async {
+    if (_notifications == enabled) return;
+    _notifications = enabled;
+    notifyListeners();
+    final preferences = await SharedPreferences.getInstance();
+    await preferences.setBool(_notificationsKey, enabled);
+    try {
+      await _settingsService.setNotificationsEnabled(enabled);
+    } catch (error) {
+      debugPrint('Synchronisation des notifications impossible : $error');
+    }
+  }
 
   Future<void> load() async {
+    final preferences = await SharedPreferences.getInstance();
+    _language = preferences.getString(_languageKey) == 'en' ? 'en' : _language;
+    _darkMode = preferences.getBool(_darkModeKey) ?? _darkMode;
+    _notifications = preferences.getBool(_notificationsKey) ?? _notifications;
+    notifyListeners();
+
     try {
-      final settings =
-          await _settingsService.getSettings();
-
-      _language =
-          settings.language == "en"
-              ? "en"
-              : "fr";
-
-      _darkMode =
-          settings.darkModeEnabled;
-
-      _notifications =
-          settings.notificationsEnabled;
-
+      final settings = await _settingsService.getSettings();
+      _language = settings.language == 'en' ? 'en' : 'fr';
+      _darkMode = settings.darkModeEnabled;
+      _notifications = settings.notificationsEnabled;
+      await preferences.setString(_languageKey, _language);
+      await preferences.setBool(_darkModeKey, _darkMode);
+      await preferences.setBool(_notificationsKey, _notifications);
       notifyListeners();
-    } catch (e) {
-      debugPrint(
-        "Erreur lors du chargement des paramètres : $e",
-      );
+    } catch (error) {
+      debugPrint('Erreur lors du chargement des paramètres : $error');
     }
   }
 }

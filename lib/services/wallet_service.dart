@@ -88,57 +88,6 @@ class WalletService {
   }
 
   // ==========================================================
-  // CRÉDITER LE PORTEFEUILLE
-  // ==========================================================
-
-  Future<void> credit(
-    int amount,
-  ) async {
-    if (amount <= 0) {
-      throw Exception(
-        "Le montant doit être supérieur à zéro.",
-      );
-    }
-
-    await walletRef.update({
-      "balance":
-          FieldValue.increment(amount),
-      "updatedAt":
-          FieldValue.serverTimestamp(),
-    });
-  }
-
-  // ==========================================================
-  // DÉBITER LE PORTEFEUILLE
-  // ==========================================================
-
-  Future<void> debit(
-    int amount,
-  ) async {
-    if (amount <= 0) {
-      throw Exception(
-        "Le montant doit être supérieur à zéro.",
-      );
-    }
-
-    final balance =
-        await getBalance();
-
-    if (balance < amount) {
-      throw Exception(
-        "Solde insuffisant.",
-      );
-    }
-
-    await walletRef.update({
-      "balance":
-          FieldValue.increment(-amount),
-      "updatedAt":
-          FieldValue.serverTimestamp(),
-    });
-  }
-
-  // ==========================================================
   // BLOQUER / DÉBLOQUER
   // ==========================================================
 

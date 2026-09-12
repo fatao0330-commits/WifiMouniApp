@@ -85,35 +85,6 @@ class UserService {
   }
 
   // ==========================================================
-  // MODIFIER LE SOLDE
-  // ==========================================================
-
-  Future<void> updateBalance(
-    int newBalance,
-  ) async {
-    final user = currentUser;
-
-    if (user == null) {
-      throw Exception(
-        "Utilisateur non connecté.",
-      );
-    }
-
-    if (newBalance < 0) {
-      throw Exception(
-        "Le solde ne peut pas être négatif.",
-      );
-    }
-
-    await _firestore
-        .collection("users")
-        .doc(user.uid)
-        .update({
-      "solde": newBalance,
-    });
-  }
-
-  // ==========================================================
   // MODIFIER L'ABONNEMENT
   // ==========================================================
 

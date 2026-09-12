@@ -34,17 +34,6 @@ class WalletService {
       doc.data() as Map<String, dynamic>,
     );
   }
-      /// Mettre à jour le solde du portefeuille
-  Future<void> updateBalance(
-    String userId,
-    int newBalance,
-  ) async {
-    await _wallets.doc(userId).update({
-      'balance': newBalance,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
-  }
-
   /// Bloquer ou débloquer le portefeuille
   Future<void> setBlocked(
     String userId,

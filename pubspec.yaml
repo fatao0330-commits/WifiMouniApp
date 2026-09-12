@@ -13,23 +13,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   firebase_core: ^3.15.2
-  firebase_auth: ^5.3.0
-  cloud_firestore: ^5.4.4
-  firebase_storage: ^12.3.2
-  file_picker: ^8.1.2
-  shared_preferences: ^2.2.3
-
-  cupertino_icons: ^1.0.8
-
-  # Localisation Flutter
-  flutter_localizations:
-    sdk: flutter
-
-  # Firebase
-  firebase_core: ^3.8.0
   firebase_auth: ^5.3.3
   cloud_firestore: ^5.5.0
   firebase_storage: ^12.3.6
+  file_picker: ^8.1.2
+  cupertino_icons: ^1.0.8
   firebase_messaging: ^15.1.5
   crypto: ^3.0.6
   local_auth: ^2.3.0

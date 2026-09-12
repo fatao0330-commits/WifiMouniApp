@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                   crossAxisCount: 2,
                   crossAxisSpacing: 15,
                   mainAxisSpacing: 15,
-                  childAspectRatio: 1.4,
+                  childAspectRatio: 1.15,
                   children: [
                     // ==================================================
                     // RECHARGER
@@ -493,13 +493,16 @@ class _HomePageState extends State<HomePage> {
 
             const SizedBox(height: 10),
 
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight:
-                    FontWeight.bold,
+            Flexible(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
