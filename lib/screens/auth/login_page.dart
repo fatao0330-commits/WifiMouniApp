@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'register_page.dart';
 import '../home/home_page.dart';
 import '../../widgets/app_language_selector.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -227,9 +228,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Connexion'),
+        title: Text(l10n.login),
         centerTitle: true,
         actions: const [AppLanguageSelector()],
       ),
@@ -251,8 +253,8 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 20),
 
-                const Text(
-                  'Bienvenue sur WiFi Mouni',
+                Text(
+                  l10n.welcome,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 25,
@@ -262,8 +264,8 @@ class _LoginPageState extends State<LoginPage> {
 
                 const SizedBox(height: 8),
 
-                const Text(
-                  'Connectez-vous à votre compte',
+                Text(
+                  l10n.loginSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 16,
@@ -279,8 +281,8 @@ class _LoginPageState extends State<LoginPage> {
                       TextInputType.emailAddress,
                   textInputAction:
                       TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Adresse email',
+                  decoration: InputDecoration(
+                    labelText: l10n.email,
                     hintText: 'exemple@email.com',
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
@@ -288,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) {
                     if (value == null ||
                         value.trim().isEmpty) {
-                      return 'Entrez votre adresse email.';
+                      return l10n.requiredEmail;
                     }
 
                     final emailRegex = RegExp(
@@ -298,7 +300,7 @@ class _LoginPageState extends State<LoginPage> {
                     if (!emailRegex.hasMatch(
                       value.trim(),
                     )) {
-                      return 'Adresse email invalide.';
+                      return l10n.invalidEmail;
                     }
 
                     return null;
@@ -319,7 +321,7 @@ class _LoginPageState extends State<LoginPage> {
                     }
                   },
                   decoration: InputDecoration(
-                    labelText: 'Mot de passe',
+                    labelText: l10n.password,
                     prefixIcon:
                         const Icon(Icons.lock_outline),
                     border:
@@ -341,7 +343,7 @@ class _LoginPageState extends State<LoginPage> {
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty) {
-                      return 'Entrez votre mot de passe.';
+                      return l10n.requiredPassword;
                     }
 
                     return null;
@@ -358,8 +360,8 @@ class _LoginPageState extends State<LoginPage> {
                         _loading
                             ? null
                             : _forgotPassword,
-                    child: const Text(
-                      'Mot de passe oublié ?',
+                    child: Text(
+                      l10n.forgotPassword,
                     ),
                   ),
                 ),
@@ -381,8 +383,8 @@ class _LoginPageState extends State<LoginPage> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text(
-                            'Se connecter',
+                        : Text(
+                          l10n.signIn,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight:
@@ -399,16 +401,16 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment:
                       MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      'Vous n’avez pas de compte ?',
+                    Text(
+                      l10n.noAccount,
                     ),
                     TextButton(
                       onPressed:
                           _loading
                               ? null
                               : _openRegisterPage,
-                      child: const Text(
-                        'Créer un compte',
+                      child: Text(
+                        l10n.signUp,
                       ),
                     ),
                   ],

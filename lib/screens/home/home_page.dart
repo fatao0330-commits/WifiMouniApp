@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 
@@ -34,6 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: const Color(0xFF101010),
 
@@ -42,8 +44,8 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          "WiFi Mouni",
+        title: Text(
+          l10n.appName,
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
@@ -107,6 +109,7 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildHomeContent() {
+    final l10n = AppLocalizations.of(context)!;
     return StreamBuilder<UserModel>(
       stream: _userService.getCurrentUser(),
       builder: (context, snapshot) {
@@ -205,8 +208,8 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 25),
 
-                const Text(
-                  "Actions rapides",
+                Text(
+                  l10n.quickActions,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -276,8 +279,8 @@ class _HomePageState extends State<HomePage> {
 
                 const SizedBox(height: 30),
 
-                const Text(
-                  "Dernières activités",
+                Text(
+                  l10n.recentActivities,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -312,8 +315,8 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment:
             CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Solde disponible",
+          Text(
+            AppLocalizations.of(context)!.availableBalance,
             style: TextStyle(
               color: Colors.white70,
               fontSize: 16,
@@ -355,7 +358,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment:
             CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(
                 Icons.wifi,
@@ -363,7 +366,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: 10),
               Text(
-                "Abonnement",
+                AppLocalizations.of(context)!.buySubscription,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -377,7 +380,7 @@ class _HomePageState extends State<HomePage> {
 
           Text(
             user.nomAbonnement.isEmpty
-                ? "Aucun abonnement actif"
+                ? AppLocalizations.of(context)!.noActiveSubscription
                 : user.nomAbonnement,
             style: const TextStyle(
               color: Colors.white,
@@ -415,9 +418,9 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(width: 10),
 
                 Text(
-                  active
-                      ? "Internet actif"
-                      : "Internet expiré",
+                    active
+                      ? AppLocalizations.of(context)!.activeInternet
+                      : AppLocalizations.of(context)!.expiredInternet,
                   style: TextStyle(
                     color: active
                         ? Colors.green
@@ -436,8 +439,8 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment:
                 MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "Jours restants",
+              Text(
+                AppLocalizations.of(context)!.remainingDays,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -630,7 +633,7 @@ class _HomePageState extends State<HomePage> {
         .showSnackBar(
       const SnackBar(
         content:
-            Text("ID copié dans le presse-papiers."),
+            Text(AppLocalizations.of(context)!.copiedId),
       ),
     );
   }

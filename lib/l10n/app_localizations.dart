@@ -48,6 +48,26 @@ class AppLocalizations {
   String get confirm => _text('Confirmer', 'Confirm');
   String get continueText => _text('Continuer', 'Continue');
   String get close => _text('Fermer', 'Close');
+  String get welcome => _text('Bienvenue sur WiFi Mouni', 'Welcome to WiFi Mouni');
+  String get signIn => _text('Se connecter', 'Sign in');
+  String get signUp => _text('Créer un compte', 'Create account');
+  String get loginSubtitle => _text('Connectez-vous à votre compte', 'Log in to your account');
+  String get noAccount => _text('Vous n’avez pas de compte ?', "Don't have an account?");
+  String get email => _text('Adresse e-mail', 'Email address');
+  String get password => _text('Mot de passe', 'Password');
+  String get forgotPassword => _text('Mot de passe oublié ?', 'Forgot password?');
+  String get invalidEmail => _text('Adresse e-mail invalide.', 'Invalid email address.');
+  String get requiredEmail => _text('Saisissez votre adresse e-mail.', 'Enter your email address.');
+  String get requiredPassword => _text('Saisissez votre mot de passe.', 'Enter your password.');
+  String get availableBalance => _text('Solde disponible', 'Available balance');
+  String get quickActions => _text('Actions rapides', 'Quick actions');
+  String get recentActivities => _text('Dernières activités', 'Recent activity');
+  String get noActiveSubscription => _text('Aucun abonnement actif', 'No active subscription');
+  String get activeInternet => _text('Internet actif', 'Internet active');
+  String get expiredInternet => _text('Internet expiré', 'Internet expired');
+  String get remainingDays => _text('Jours restants', 'Days remaining');
+  String get copiedId => _text('ID copié dans le presse-papiers.', 'ID copied to clipboard.');
+  String get notificationsComingSoon => _text('Les notifications seront disponibles prochainement.', 'Notifications will be available soon.');
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

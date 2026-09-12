@@ -18,6 +18,7 @@ import '../settings/change_pin_page.dart';
 import '../security/create_pin_page.dart';
 import '../security/forgot_pin_page.dart';
 import '../../widgets/app_language_selector.dart';
+import '../../services/app_settings_controller.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -27,6 +28,22 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  static const _languageNames = <String, String>{
+    'fr': 'Français',
+    'en': 'English',
+    'es': 'Español',
+    'ar': 'العربية',
+    'pt': 'Português',
+    'hi': 'हिन्दी',
+    'de': 'Deutsch',
+    'ja': '日本語',
+    'ru': 'Русский',
+    'zh': '中文',
+    'it': 'Italiano',
+    'tr': 'Türkçe',
+    'ko': '한국어',
+    'nl': 'Nederlands',
+  };
   final PinService _pinService = PinService();
   final SettingsService _settingsService = SettingsService();
   final BiometricService _biometricService = BiometricService();
@@ -92,8 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
         _darkModeEnabled =
             settings.darkModeEnabled;
 
-        _language =
-            settings.language == 'en' ? 'en' : 'fr';
+        _language = appSettings.language;
 
         _loading = false;
       });
@@ -281,46 +297,15 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
 
-              ListTile(
-                leading: const Icon(
-                  Icons.language,
+              ...AppSettingsController.supportedLanguageCodes.map(
+                (code) => ListTile(
+                  leading: const Icon(Icons.language),
+                  title: Text(_languageNames[code] ?? code),
+                  trailing: appSettings.language == code
+                      ? const Icon(Icons.check, color: Colors.blue)
+                      : null,
+                  onTap: () => Navigator.pop(sheetContext, code),
                 ),
-                title: Text(
-                  l10n.french,
-                ),
-                trailing: _language == 'fr'
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.blue,
-                      )
-                    : null,
-                onTap: () {
-                  Navigator.pop(
-                    sheetContext,
-                    'fr',
-                  );
-                },
-              ),
-
-              ListTile(
-                leading: const Icon(
-                  Icons.language,
-                ),
-                title: Text(
-                  l10n.english,
-                ),
-                trailing: _language == 'en'
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.blue,
-                      )
-                    : null,
-                onTap: () {
-                  Navigator.pop(
-                    sheetContext,
-                    'en',
-                  );
-                },
               ),
 
               const SizedBox(height: 10),
@@ -339,22 +324,18 @@ class _SettingsPageState extends State<SettingsPage> {
     }
 
     try {
-      await appSettings.setLanguage(
-        selectedLanguage,
-      );
+      await appSettings.setLanguage(selectedLanguage);
 
       if (!mounted) return;
 
       setState(() {
-        _language = selectedLanguage;
+        _language = appSettings.language;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            selectedLanguage == 'fr'
-                ? 'Langue française sélectionnée.'
-                : 'English language selected.',
+            _languageNames[selectedLanguage] ?? selectedLanguage,
           ),
         ),
       );
@@ -368,9 +349,9 @@ class _SettingsPageState extends State<SettingsPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            selectedLanguage == 'fr'
-                ? 'Impossible de changer la langue.'
-                : 'Unable to change language.',
+            _languageNames[selectedLanguage] == null
+                ? 'Unable to change language.'
+                : 'Impossible de changer la langue.',
           ),
         ),
       );
@@ -706,11 +687,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     l10n.language,
                   ),
 
-                  subtitle: Text(
-                    _language == 'fr'
-                        ? l10n.french
-                        : l10n.english,
-                  ),
+                  subtitle: Text(_languageNames[appSettings.language] ?? appSettings.language),
 
                   trailing: const Icon(
                     Icons.arrow_forward_ios,
