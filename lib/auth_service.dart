@@ -39,6 +39,11 @@ class AuthService {
     return preferences.containsKey(_pinKey);
   }
 
+  static Future<bool> verifyPin(String pin) async {
+    final preferences = await SharedPreferences.getInstance();
+    return preferences.getString(_pinKey) == pin;
+  }
+
   static Future<void> savePin(String pin) async {
     final preferences = await SharedPreferences.getInstance();
     await preferences.setString(_pinKey, pin);
