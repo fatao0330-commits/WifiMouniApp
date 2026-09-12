@@ -15,6 +15,7 @@ class LocaleProvider extends ChangeNotifier {
   static const supportedLocales = <Locale>[
     Locale('fr'), Locale('en'), Locale('es'), Locale('ar'), Locale('pt'),
     Locale('hi'), Locale('de'), Locale('ja'), Locale('ru'), Locale('zh'),
+    Locale('it'), Locale('tr'), Locale('ko'), Locale('nl'),
   ];
 
   Future<void> load() async {
