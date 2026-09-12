@@ -17,6 +17,7 @@ import '../support/support_page.dart';
 import '../settings/change_pin_page.dart';
 import '../security/create_pin_page.dart';
 import '../security/forgot_pin_page.dart';
+import '../../widgets/app_language_selector.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -533,6 +534,7 @@ class _SettingsPageState extends State<SettingsPage> {
           l10n.settings,
         ),
         centerTitle: true,
+        actions: const [AppLanguageSelector()],
       ),
 
       body: ListView(

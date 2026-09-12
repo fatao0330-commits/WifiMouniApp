@@ -77,7 +77,7 @@ class PinService {
   Future<bool> hasPin() async {
     final preferences = await SharedPreferences.getInstance();
     final cached = preferences.getBool(_pinConfiguredKey);
-    if (cached != null) return cached;
+    if (cached == true) return true;
     final doc = await _userDoc.get();
     final configured = doc.exists && doc.data()?['pinConfigured'] == true;
     await preferences.setBool(_pinConfiguredKey, configured);
@@ -174,6 +174,8 @@ class PinService {
         'currentPin': oldValue,
         'newPin': newValue,
       });
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setBool(_pinConfiguredKey, true);
     } on FirebaseFunctionsException catch (e) {
       throw Exception(
         e.message ?? 'Impossible de modifier le code PIN.',

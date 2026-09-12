@@ -25,13 +25,13 @@ class PaymentMethodModel {
   ) {
     return PaymentMethodModel(
       id: id,
-      nom: data["nom"] ?? "",
-      logo: data["logo"] ?? "",
-      actif: data["actif"] ?? true,
-      ordre: data["ordre"] ?? 0,
-      type: data["type"] ?? "",
-      pays: data["pays"] ?? "",
-      codeUssd: data["codeUssd"] ?? "",
+      nom: (data["nom"] ?? data["name"] ?? "") as String,
+      logo: (data["logo"] ?? data["logoUrl"] ?? "") as String,
+      actif: (data["actif"] ?? data["enabled"] ?? true) as bool,
+      ordre: ((data["ordre"] ?? data["sortOrder"] ?? 0) as num).toInt(),
+      type: (data["type"] ?? "") as String,
+      pays: (data["pays"] ?? data["country"] ?? "") as String,
+      codeUssd: (data["codeUssd"] ?? data["code"] ?? "") as String,
     );
   }
 }

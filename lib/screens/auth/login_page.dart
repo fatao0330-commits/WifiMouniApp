@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'register_page.dart';
 import '../home/home_page.dart';
+import '../../widgets/app_language_selector.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -230,6 +231,7 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Connexion'),
         centerTitle: true,
+        actions: const [AppLanguageSelector()],
       ),
       body: SafeArea(
         child: SingleChildScrollView(

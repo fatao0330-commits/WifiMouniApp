@@ -8,16 +8,14 @@ class PaymentMethodService {
   Stream<List<PaymentMethodModel>> getPaymentMethods() {
     return _firestore
         .collection("payment_methods")
-        .where("actif", isEqualTo: true)
-        .orderBy("ordre")
         .snapshots()
         .map((snapshot) {
-      return snapshot.docs.map((doc) {
-        return PaymentMethodModel.fromMap(
-          doc.id,
-          doc.data(),
-        );
-      }).toList();
+      final methods = snapshot.docs
+          .map((doc) => PaymentMethodModel.fromMap(doc.id, doc.data()))
+          .where((method) => method.actif && (method.pays.isEmpty || method.pays.toUpperCase() == 'CI'))
+          .toList();
+      methods.sort((a, b) => a.ordre.compareTo(b.ordre));
+      return methods;
     });
   }
 }

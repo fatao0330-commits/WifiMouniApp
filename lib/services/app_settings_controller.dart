@@ -4,8 +4,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'settings_service.dart';
 
 class AppSettingsController extends ChangeNotifier {
+  static const supportedLanguageCodes = <String>[
+    'fr', 'en', 'es', 'ar', 'pt', 'hi', 'de', 'ja', 'ru', 'zh', 'it', 'tr', 'ko', 'nl',
+  ];
   AppSettingsController({required String language, required bool darkMode, required bool notifications})
-      : _language = language == 'en' ? 'en' : 'fr',
+      : _language = supportedLanguageCodes.contains(language) ? language : 'fr',
         _darkMode = darkMode,
         _notifications = notifications;
 
@@ -25,7 +28,7 @@ class AppSettingsController extends ChangeNotifier {
   ThemeMode get themeMode => _darkMode ? ThemeMode.dark : ThemeMode.light;
 
   Future<void> setLanguage(String language) async {
-    final newLanguage = language == 'en' ? 'en' : 'fr';
+    final newLanguage = supportedLanguageCodes.contains(language) ? language : 'fr';
     if (_language == newLanguage) return;
     _language = newLanguage;
     notifyListeners();
@@ -66,14 +69,15 @@ class AppSettingsController extends ChangeNotifier {
 
   Future<void> load() async {
     final preferences = await SharedPreferences.getInstance();
-    _language = preferences.getString(_languageKey) == 'en' ? 'en' : _language;
+    final savedLanguage = preferences.getString(_languageKey);
+    _language = supportedLanguageCodes.contains(savedLanguage) ? savedLanguage! : _language;
     _darkMode = preferences.getBool(_darkModeKey) ?? _darkMode;
     _notifications = preferences.getBool(_notificationsKey) ?? _notifications;
     notifyListeners();
 
     try {
       final settings = await _settingsService.getSettings();
-      _language = settings.language == 'en' ? 'en' : 'fr';
+      _language = supportedLanguageCodes.contains(settings.language) ? settings.language : 'fr';
       _darkMode = settings.darkModeEnabled;
       _notifications = settings.notificationsEnabled;
       await preferences.setString(_languageKey, _language);

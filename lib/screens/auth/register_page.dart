@@ -5,6 +5,7 @@ import '../../services/auth_service.dart';
 import '../home/home_page.dart';
 import 'email_verification_page.dart';
 import 'otp_page.dart';
+import '../../widgets/app_language_selector.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -462,6 +463,7 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
 
         centerTitle: true,
+        actions: const [AppLanguageSelector()],
       ),
 
       body: SafeArea(
