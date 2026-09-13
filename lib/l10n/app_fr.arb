@@ -42,5 +42,26 @@
   "cancel": "Annuler",
   "confirm": "Confirmer",
   "continueText": "Continuer",
-  "close": "Fermer"
+  "close": "Fermer",
+
+  "login": "Connexion",
+  "welcome": "Bienvenue sur WiFi Mouni",
+  "loginSubtitle": "Connectez-vous à votre compte",
+  "email": "Adresse e-mail",
+  "requiredEmail": "Saisissez votre adresse e-mail.",
+  "invalidEmail": "Adresse e-mail invalide.",
+  "password": "Mot de passe",
+  "requiredPassword": "Saisissez votre mot de passe.",
+  "forgotPassword": "Mot de passe oublié ?",
+  "signIn": "Se connecter",
+  "noAccount": "Vous n’avez pas de compte ?",
+  "signUp": "Créer un compte",
+  "quickActions": "Actions rapides",
+  "recentActivities": "Dernières activités",
+  "availableBalance": "Solde disponible",
+  "noActiveSubscription": "Aucun abonnement actif",
+  "activeInternet": "Internet actif",
+  "expiredInternet": "Internet expiré",
+  "remainingDays": "Jours restants",
+  "copiedId": "ID copié dans le presse-papiers."
 }

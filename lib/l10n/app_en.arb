@@ -42,5 +42,26 @@
   "cancel": "Cancel",
   "confirm": "Confirm",
   "continueText": "Continue",
-  "close": "Close"
+  "close": "Close",
+
+  "login": "Login",
+  "welcome": "Welcome to WiFi Mouni",
+  "loginSubtitle": "Log in to your account",
+  "email": "Email address",
+  "requiredEmail": "Enter your email address.",
+  "invalidEmail": "Invalid email address.",
+  "password": "Password",
+  "requiredPassword": "Enter your password.",
+  "forgotPassword": "Forgot password?",
+  "signIn": "Sign in",
+  "noAccount": "Don't have an account?",
+  "signUp": "Create account",
+  "quickActions": "Quick actions",
+  "recentActivities": "Recent activity",
+  "availableBalance": "Available balance",
+  "noActiveSubscription": "No active subscription",
+  "activeInternet": "Internet active",
+  "expiredInternet": "Internet expired",
+  "remainingDays": "Days remaining",
+  "copiedId": "ID copied to clipboard."
 }

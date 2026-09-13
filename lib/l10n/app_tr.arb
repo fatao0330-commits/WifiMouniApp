@@ -44,5 +44,19 @@
   "paymentRequired": "Bir ödeme yöntemi seçin.",
   "confirmRecharge": "Yüklemeyi onayla",
   "rechargeFailed": "Yükleme tamamlanamadı.",
-  "currency": "€"
+  "currency": "€",
+  "requiredEmail": "E-posta adresinizi girin.",
+  "invalidEmail": "Geçersiz e-posta adresi.",
+  "requiredPassword": "Şifrenizi girin.",
+  "forgotPassword": "Şifrenizi mi unuttunuz?",
+  "signIn": "Giriş yap",
+  "signUp": "Hesap oluştur",
+  "quickActions": "Hızlı işlemler",
+  "recentActivities": "Son etkinlikler",
+  "availableBalance": "Kullanılabilir bakiye",
+  "noActiveSubscription": "Aktif abonelik yok",
+  "activeInternet": "İnternet aktif",
+  "expiredInternet": "İnternet süresi doldu",
+  "remainingDays": "Kalan günler",
+  "copiedId": "Kimlik panoya kopyalandı."
 }

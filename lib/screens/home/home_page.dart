@@ -631,7 +631,7 @@ class _HomePageState extends State<HomePage> {
 
     ScaffoldMessenger.of(context)
         .showSnackBar(
-      const SnackBar(
+      SnackBar(
         content:
             Text(AppLocalizations.of(context)!.copiedId),
       ),

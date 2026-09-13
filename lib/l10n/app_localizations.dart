@@ -48,6 +48,7 @@ class AppLocalizations {
   String get confirm => _text('Confirmer', 'Confirm');
   String get continueText => _text('Continuer', 'Continue');
   String get close => _text('Fermer', 'Close');
+  String get login => _text('Connexion', 'Login');
   String get welcome => _text('Bienvenue sur WiFi Mouni', 'Welcome to WiFi Mouni');
   String get signIn => _text('Se connecter', 'Sign in');
   String get signUp => _text('Créer un compte', 'Create account');

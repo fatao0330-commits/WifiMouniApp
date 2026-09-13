@@ -44,5 +44,19 @@
   "paymentRequired": "Seleziona un metodo di pagamento.",
   "confirmRecharge": "Conferma ricarica",
   "rechargeFailed": "Non è stato possibile completare la ricarica.",
-  "currency": "€"
+  "currency": "€",
+  "requiredEmail": "Inserisci il tuo indirizzo email.",
+  "invalidEmail": "Indirizzo email non valido.",
+  "requiredPassword": "Inserisci la password.",
+  "forgotPassword": "Password dimenticata?",
+  "signIn": "Accedi",
+  "signUp": "Crea account",
+  "quickActions": "Azioni rapide",
+  "recentActivities": "Attività recenti",
+  "availableBalance": "Saldo disponibile",
+  "noActiveSubscription": "Nessun abbonamento attivo",
+  "activeInternet": "Internet attivo",
+  "expiredInternet": "Internet scaduto",
+  "remainingDays": "Giorni rimanenti",
+  "copiedId": "ID copiato negli appunti."
 }

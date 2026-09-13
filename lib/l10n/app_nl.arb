@@ -44,5 +44,19 @@
   "paymentRequired": "Selecteer een betaalmethode.",
   "confirmRecharge": "Opwaardering bevestigen",
   "rechargeFailed": "Opwaarderen is niet gelukt.",
-  "currency": "€"
+  "currency": "€",
+  "requiredEmail": "Voer je e-mailadres in.",
+  "invalidEmail": "Ongeldig e-mailadres.",
+  "requiredPassword": "Voer je wachtwoord in.",
+  "forgotPassword": "Wachtwoord vergeten?",
+  "signIn": "Inloggen",
+  "signUp": "Account aanmaken",
+  "quickActions": "Snelle acties",
+  "recentActivities": "Recente activiteiten",
+  "availableBalance": "Beschikbaar saldo",
+  "noActiveSubscription": "Geen actief abonnement",
+  "activeInternet": "Internet actief",
+  "expiredInternet": "Internet verlopen",
+  "remainingDays": "Resterende dagen",
+  "copiedId": "ID naar klembord gekopieerd."
 }

@@ -44,5 +44,19 @@
   "paymentRequired": "결제 수단을 선택하세요.",
   "confirmRecharge": "충전 확인",
   "rechargeFailed": "충전을 완료할 수 없습니다.",
-  "currency": "€"
+  "currency": "€",
+  "requiredEmail": "이메일 주소를 입력하세요.",
+  "invalidEmail": "올바르지 않은 이메일 주소입니다.",
+  "requiredPassword": "비밀번호를 입력하세요.",
+  "forgotPassword": "비밀번호를 잊으셨나요?",
+  "signIn": "로그인",
+  "signUp": "계정 만들기",
+  "quickActions": "빠른 작업",
+  "recentActivities": "최근 활동",
+  "availableBalance": "사용 가능 잔액",
+  "noActiveSubscription": "활성 구독 없음",
+  "activeInternet": "인터넷 활성",
+  "expiredInternet": "인터넷 만료",
+  "remainingDays": "남은 일수",
+  "copiedId": "ID가 클립보드에 복사되었습니다."
 }
