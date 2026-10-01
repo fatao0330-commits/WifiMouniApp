@@ -35,7 +35,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: const Color(0xFF101010),
 
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildHomeContent() {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return StreamBuilder<UserModel>(
       stream: _userService.getCurrentUser(),
       builder: (context, snapshot) {
@@ -316,7 +316,7 @@ class _HomePageState extends State<HomePage> {
             CrossAxisAlignment.start,
         children: [
           Text(
-            AppLocalizations.of(context)!.availableBalance,
+            AppLocalizations.of(context).availableBalance,
             style: TextStyle(
               color: Colors.white70,
               fontSize: 16,
@@ -366,7 +366,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: 10),
               Text(
-                AppLocalizations.of(context)!.buySubscription,
+                AppLocalizations.of(context).buySubscription,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 20,
@@ -380,7 +380,7 @@ class _HomePageState extends State<HomePage> {
 
           Text(
             user.nomAbonnement.isEmpty
-                ? AppLocalizations.of(context)!.noActiveSubscription
+                ? AppLocalizations.of(context).noActiveSubscription
                 : user.nomAbonnement,
             style: const TextStyle(
               color: Colors.white,
@@ -419,8 +419,8 @@ class _HomePageState extends State<HomePage> {
 
                 Text(
                     active
-                      ? AppLocalizations.of(context)!.activeInternet
-                      : AppLocalizations.of(context)!.expiredInternet,
+                      ? AppLocalizations.of(context).activeInternet
+                      : AppLocalizations.of(context).expiredInternet,
                   style: TextStyle(
                     color: active
                         ? Colors.green
@@ -440,7 +440,7 @@ class _HomePageState extends State<HomePage> {
                 MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                AppLocalizations.of(context)!.remainingDays,
+                AppLocalizations.of(context).remainingDays,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
@@ -633,7 +633,7 @@ class _HomePageState extends State<HomePage> {
         .showSnackBar(
       SnackBar(
         content:
-            Text(AppLocalizations.of(context)!.copiedId),
+            Text(AppLocalizations.of(context).copiedId),
       ),
     );
   }

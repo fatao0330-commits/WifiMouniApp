@@ -64,7 +64,7 @@ class _SettingsPageState extends State<SettingsPage> {
   // ==========================================================
 
   AppLocalizations get l10n {
-    return AppLocalizations.of(context)!;
+    return AppLocalizations.of(context);
   }
 
   // ==========================================================

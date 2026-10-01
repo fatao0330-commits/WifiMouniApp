@@ -228,7 +228,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.login),

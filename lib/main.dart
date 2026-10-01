@@ -257,7 +257,7 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
 
       locale: appSettings.locale,
 
-      supportedLocales: AppSettingsController.supportedLanguageCodes.map(Locale.new).toList(growable: false),
+      supportedLocales: AppLocalizations.supportedLocales,
 
       localizationsDelegates: const [
         AppLocalizations.delegate,

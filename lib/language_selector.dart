@@ -19,7 +19,7 @@ class LanguageSelector extends StatelessWidget {
       value: provider.locale,
       underline: const SizedBox.shrink(),
       icon: const Icon(Icons.language),
-      items: LocaleProvider.supportedLocales.map((locale) => DropdownMenuItem(value: locale, child: Text(names[locale.languageCode]!))).toList(),
+      items: LocaleProvider.supportedLocales.map((locale) => DropdownMenuItem(value: locale, child: Text(names[locale.languageCode] ?? locale.languageCode))).toList(),
       onChanged: (locale) {
         if (locale != null) provider.setLocale(locale);
       },
@@ -30,5 +30,7 @@ class LanguageSelector extends StatelessWidget {
 class LocaleScope extends InheritedNotifier<LocaleProvider> {
   const LocaleScope({required super.notifier, required super.child});
 
-  static LocaleProvider of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<LocaleScope>()!.notifier!;
+  static LocaleProvider? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<LocaleScope>()?.notifier;
+
+  static LocaleProvider of(BuildContext context) => maybeOf(context) ?? (throw FlutterError('LocaleScope introuvable dans l’arbre des widgets.'));
 }

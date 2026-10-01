@@ -6,8 +6,18 @@ class AppLocalizations {
 
   final Locale locale;
   static const delegate = AppLocalizationsDelegate();
+  static const supportedLanguageCodes = <String>[
+    'fr', 'en', 'es', 'ar', 'pt', 'hi', 'de', 'ja', 'ru', 'zh', 'it', 'tr', 'ko', 'nl',
+  ];
+  static const supportedLocales = <Locale>[
+    Locale('fr'), Locale('en'), Locale('es'), Locale('ar'), Locale('pt'),
+    Locale('hi'), Locale('de'), Locale('ja'), Locale('ru'), Locale('zh'),
+    Locale('it'), Locale('tr'), Locale('ko'), Locale('nl'),
+  ];
 
-  static AppLocalizations? of(BuildContext context) => Localizations.of<AppLocalizations>(context, AppLocalizations);
+  static AppLocalizations of(BuildContext context) =>
+      Localizations.of<AppLocalizations>(context, AppLocalizations) ??
+      const AppLocalizations(Locale('fr'));
 
   bool get _isFrench => locale.languageCode == 'fr';
   String _text(String french, String english) => _isFrench ? french : english;
@@ -75,7 +85,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) => const ['fr', 'en', 'es', 'ar', 'pt', 'hi', 'de', 'ja', 'ru', 'zh', 'it', 'tr', 'ko', 'nl'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => AppLocalizations.supportedLanguageCodes.contains(locale.languageCode);
 
   @override
   Future<AppLocalizations> load(Locale locale) => SynchronousFuture(AppLocalizations(locale));

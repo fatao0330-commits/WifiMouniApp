@@ -63,5 +63,6 @@
   "activeInternet": "Internet active",
   "expiredInternet": "Internet expired",
   "remainingDays": "Days remaining",
-  "copiedId": "ID copied to clipboard."
+  "copiedId": "ID copied to clipboard.",
+  "notificationsComingSoon": "Notifications will be available soon."
 }

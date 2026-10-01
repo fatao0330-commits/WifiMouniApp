@@ -18,7 +18,7 @@ class AppLanguageSelector extends StatelessWidget {
       icon: const Icon(Icons.language),
       initialValue: appSettings.language,
       onSelected: appSettings.setLanguage,
-      itemBuilder: (context) => AppSettingsController.supportedLanguageCodes.map((code) => PopupMenuItem<String>(value: code, child: Text(names[code]!))).toList(),
+      itemBuilder: (context) => AppSettingsController.supportedLanguageCodes.map((code) => PopupMenuItem<String>(value: code, child: Text(names[code] ?? code))).toList(),
     );
   }
 }

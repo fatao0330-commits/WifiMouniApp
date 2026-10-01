@@ -31,6 +31,10 @@ class LocaleProvider extends ChangeNotifier {
     if (!supportedLocales.any((item) => item.languageCode == locale.languageCode)) return;
     _locale = locale;
     notifyListeners();
-    await AppSettings.saveLocale(locale.languageCode);
+    try {
+      await AppSettings.saveLocale(locale.languageCode);
+    } catch (error) {
+      debugPrint('Impossible d’enregistrer la langue localement : $error');
+    }
   }
 }

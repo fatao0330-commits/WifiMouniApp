@@ -63,5 +63,6 @@
   "activeInternet": "Internet actif",
   "expiredInternet": "Internet expiré",
   "remainingDays": "Jours restants",
-  "copiedId": "ID copié dans le presse-papiers."
+  "copiedId": "ID copié dans le presse-papiers.",
+  "notificationsComingSoon": "Les notifications seront bientôt disponibles."
 }
