@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:app_links/app_links.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -9,11 +6,8 @@ import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
 
 import 'screens/auth/login_page.dart';
-import 'screens/auth/reset_password_page.dart';
 
 import 'services/app_settings_controller.dart';
-
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 // ============================================================
 // CONTRÔLEUR GLOBAL DES PARAMÈTRES
@@ -84,12 +78,6 @@ class WiFiMouniApp extends StatefulWidget {
 }
 
 class _WiFiMouniAppState extends State<WiFiMouniApp> {
-  final AppLinks _appLinks = AppLinks();
-
-  StreamSubscription<Uri>? _linkSubscription;
-
-  bool _openingResetPage = false;
-
   // ==========================================================
   // INIT STATE
   // ==========================================================
@@ -106,8 +94,6 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
       _settingsChanged,
     );
 
-    // Initialiser les Deep Links.
-    _initDeepLinks();
   }
 
   // ==ÿ========================================================
@@ -123,105 +109,6 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
   }
 
   // ==========================================================
-  // DEEP LINKS
-  // ==========================================================
-
-  Future<void> _initDeepLinks() async {
-    try {
-      // --------------------------------------------------------
-      // LIEN QUI A OUVERT L'APPLICATION
-      // --------------------------------------------------------
-
-      final Uri? initialUri = await _appLinks.getInitialLink();
-
-      if (initialUri != null) {
-        _handleDeepLink(initialUri);
-      }
-
-      // --------------------------------------------------------
-      // LIENS REÇUS ALORS QUE L'APPLICATION EST OUVERTE
-      // --------------------------------------------------------
-
-      _linkSubscription = _appLinks.uriLinkStream.listen(
-        (Uri uri) {
-          _handleDeepLink(uri);
-        },
-        onError: (error) {
-          debugPrint(
-            'Erreur Deep Link : $error',
-          );
-        },
-      );
-    } catch (e) {
-      debugPrint(
-        'Impossible d\'initialiser les Deep Links : $e',
-      );
-    }
-  }
-
-  // ==========================================================
-  // TRAITER UN DEEP LINK
-  // ==========================================================
-
-  void _handleDeepLink(Uri uri) {
-    debugPrint(
-      'Deep Link reçu : $uri',
-    );
-
-    final String? mode = uri.queryParameters['mode'];
-
-    final String? oobCode = uri.queryParameters['oobCode'];
-
-    if (mode == 'resetPassword' && oobCode != null && oobCode.isNotEmpty) {
-      _openResetPasswordPage(
-        oobCode,
-      );
-    }
-  }
-
-  // ==========================================================
-  // OUVRIR RESET PASSWORD
-  // ==========================================================
-
-  void _openResetPasswordPage(
-    String oobCode,
-  ) {
-    if (_openingResetPage) {
-      return;
-    }
-
-    _openingResetPage = true;
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        final navigator = navigatorKey.currentState;
-
-        if (navigator == null) {
-          _openingResetPage = false;
-          return;
-        }
-
-        navigator.push(
-          MaterialPageRoute(
-            builder: (_) => ResetPasswordPage(
-              oobCode: oobCode,
-            ),
-          ),
-        );
-
-        Future.delayed(
-          const Duration(
-            milliseconds: 500,
-          ),
-          () {
-            _openingResetPage = false;
-          },
-        );
-      },
-    );
-  }
-
-  // ==========================================================
   // DISPOSE
   // ==========================================================
 
@@ -230,8 +117,6 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
     appSettings.removeListener(
       _settingsChanged,
     );
-
-    _linkSubscription?.cancel();
 
     super.dispose();
   }
@@ -245,8 +130,6 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
     BuildContext context,
   ) {
     return MaterialApp(
-      navigatorKey: navigatorKey,
-
       debugShowCheckedModeBanner: false,
 
       title: 'WiFi Mouni',

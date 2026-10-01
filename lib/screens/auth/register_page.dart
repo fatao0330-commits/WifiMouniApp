@@ -2,8 +2,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
+import '../../utils/phone_number_utils.dart';
+import '../../l10n/app_localizations.dart';
 import '../home/home_page.dart';
-import 'email_verification_page.dart';
 import 'otp_page.dart';
 import '../../widgets/app_language_selector.dart';
 
@@ -39,6 +40,9 @@ class _RegisterPageState extends State<RegisterPage> {
   bool hidePassword = true;
   bool hideConfirmPassword = true;
   bool loading = false;
+  bool _otpPageOpened = false;
+  bool _finishingRegistration = false;
+  bool _registrationFinished = false;
 
   @override
   void dispose() {
@@ -55,10 +59,11 @@ class _RegisterPageState extends State<RegisterPage> {
   // ============================================================
 
   Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 
+    final strings = AppLocalizations.of(context);
     FocusScope.of(context).unfocus();
 
     setState(() {
@@ -69,8 +74,9 @@ class _RegisterPageState extends State<RegisterPage> {
       final email =
           emailController.text.trim().toLowerCase();
 
-      final phone =
-          telephoneController.text.trim();
+      final phone = PhoneNumberUtils.normalize(
+        telephoneController.text,
+      );
 
       // --------------------------------------------------------
       // 1. CRÉATION DU COMPTE + PROFIL + WALLET
@@ -92,7 +98,7 @@ class _RegisterPageState extends State<RegisterPage> {
         });
 
         _showMessage(
-          result,
+          _registrationErrorText(result, strings),
           error: true,
         );
 
@@ -100,24 +106,7 @@ class _RegisterPageState extends State<RegisterPage> {
       }
 
       // --------------------------------------------------------
-      // 2. VÉRIFICATION DU NUMÉRO OBLIGATOIRE
-      // --------------------------------------------------------
-
-      if (phone.isEmpty) {
-        setState(() {
-          loading = false;
-        });
-
-        _showMessage(
-          'Numéro de téléphone obligatoire.',
-          error: true,
-        );
-
-        return;
-      }
-
-      // --------------------------------------------------------
-      // 3. ENVOYER LE CODE OTP
+      // ENVOYER LE CODE OTP
       // --------------------------------------------------------
 
       await _sendOtp(phone);
@@ -129,8 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       _showMessage(
-        e.message ??
-            'Impossible de créer le compte.',
+        _registrationErrorText(e.code, strings),
         error: true,
       );
     } catch (e) {
@@ -141,9 +129,31 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       _showMessage(
-        'Une erreur est survenue.',
+        strings.registrationFailed,
         error: true,
       );
+    }
+  }
+
+  String _registrationErrorText(
+    String code,
+    AppLocalizations strings,
+  ) {
+    switch (code) {
+      case 'email-already-in-use':
+        return strings.emailAlreadyInUse;
+      case 'invalid-email':
+        return strings.invalidEmail;
+      case 'weak-password':
+        return strings.weakPassword;
+      case 'operation-not-allowed':
+        return strings.emailSignUpUnavailable;
+      case 'network-request-failed':
+        return strings.networkError;
+      case 'invalidPhoneNumber':
+        return strings.invalidPhoneNumber;
+      default:
+        return strings.registrationFailed;
     }
   }
 
@@ -154,6 +164,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _sendOtp(
     String phoneNumber,
   ) async {
+    final strings = AppLocalizations.of(context);
     try {
       await _auth.verifyPhoneNumber(
         phoneNumber: phoneNumber,
@@ -164,6 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         verificationCompleted:
             (PhoneAuthCredential credential) async {
+          if (_registrationFinished || _finishingRegistration) return;
           final user = _auth.currentUser;
 
           if (user == null) {
@@ -174,7 +186,7 @@ class _RegisterPageState extends State<RegisterPage> {
             });
 
             _showMessage(
-              'Session utilisateur introuvable.',
+              strings.accountSessionMissing,
               error: true,
             );
 
@@ -185,8 +197,10 @@ class _RegisterPageState extends State<RegisterPage> {
             await user.linkWithCredential(
               credential,
             );
-
-            await user.reload();
+            final marked = await authService.markPhoneVerified();
+            if (!marked) {
+              throw StateError('Phone verification could not be saved.');
+            }
 
             if (!mounted) return;
 
@@ -195,10 +209,10 @@ class _RegisterPageState extends State<RegisterPage> {
             });
 
             _showMessage(
-              'Numéro vérifié automatiquement.',
+              strings.phoneVerified,
             );
 
-            await _openEmailVerification();
+            await _finishRegistration();
           } on FirebaseAuthException catch (e) {
             if (!mounted) return;
 
@@ -207,10 +221,15 @@ class _RegisterPageState extends State<RegisterPage> {
             });
 
             _showMessage(
-              e.message ??
-                  'Impossible de vérifier le numéro.',
+              e.code == 'credential-already-in-use'
+                  ? strings.phoneAlreadyInUse
+                  : strings.otpVerificationFailed,
               error: true,
             );
+          } catch (_) {
+            if (!mounted) return;
+            setState(() => loading = false);
+            _showMessage(strings.otpVerificationFailed, error: true);
           }
         },
 
@@ -227,8 +246,7 @@ class _RegisterPageState extends State<RegisterPage> {
           });
 
           _showMessage(
-            e.message ??
-                'Impossible d’envoyer le code OTP.',
+            strings.otpSendFailed,
             error: true,
           );
         },
@@ -241,8 +259,9 @@ class _RegisterPageState extends State<RegisterPage> {
           String verificationId,
           int? resendToken,
         ) async {
-          if (!mounted) return;
+          if (!mounted || _otpPageOpened || _registrationFinished) return;
 
+          _otpPageOpened = true;
           setState(() {
             loading = false;
           });
@@ -259,19 +278,12 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           );
+          _otpPageOpened = false;
 
           if (!mounted) return;
 
           if (verified == true) {
-            _showMessage(
-              'Numéro vérifié avec succès.',
-            );
-
-            // --------------------------------------------------
-            // APRÈS OTP → VÉRIFICATION EMAIL
-            // --------------------------------------------------
-
-            await _openEmailVerification();
+            await _finishRegistration();
           }
         },
 
@@ -290,36 +302,9 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       _showMessage(
-        'Impossible d’envoyer le code OTP.',
+        strings.otpSendFailed,
         error: true,
       );
-    }
-  }
-
-  // ============================================================
-  // VÉRIFICATION EMAIL
-  // ============================================================
-
-  Future<void> _openEmailVerification() async {
-    if (!mounted) return;
-
-    final emailVerified =
-        await Navigator.push<bool>(
-      context,
-      MaterialPageRoute(
-        builder: (_) =>
-            const EmailVerificationPage(),
-      ),
-    );
-
-    if (!mounted) return;
-
-    // ----------------------------------------------------------
-    // L'EMAIL EST VALIDÉ
-    // ----------------------------------------------------------
-
-    if (emailVerified == true) {
-      await _finishRegistration();
     }
   }
 
@@ -328,7 +313,9 @@ class _RegisterPageState extends State<RegisterPage> {
   // ============================================================
 
   Future<void> _finishRegistration() async {
-    if (!mounted) return;
+    if (!mounted || _finishingRegistration || _registrationFinished) return;
+    _finishingRegistration = true;
+    final strings = AppLocalizations.of(context);
 
     setState(() {
       loading = true;
@@ -338,18 +325,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final user = _auth.currentUser;
 
       if (user == null) {
-        if (!mounted) return;
-
-        setState(() {
-          loading = false;
-        });
-
-        _showMessage(
-          'Session utilisateur introuvable.',
-          error: true,
-        );
-
-        return;
+        throw StateError(strings.accountSessionMissing);
       }
 
       // Actualiser les informations Firebase.
@@ -358,39 +334,14 @@ class _RegisterPageState extends State<RegisterPage> {
       final refreshedUser =
           _auth.currentUser;
 
-      if (refreshedUser == null) {
-        if (!mounted) return;
-
-        setState(() {
-          loading = false;
-        });
-
-        _showMessage(
-          'Impossible de récupérer votre compte.',
-          error: true,
-        );
-
-        return;
+      if (refreshedUser == null ||
+          refreshedUser.phoneNumber !=
+              PhoneNumberUtils.normalize(telephoneController.text)) {
+        throw StateError(strings.otpVerificationFailed);
       }
 
-      // --------------------------------------------------------
-      // VÉRIFICATION FINALE EMAIL
-      // --------------------------------------------------------
-
-      if (!refreshedUser.emailVerified) {
-        if (!mounted) return;
-
-        setState(() {
-          loading = false;
-        });
-
-        _showMessage(
-          'Votre adresse e-mail n’est pas encore vérifiée.',
-          error: true,
-        );
-
-        return;
-      }
+      final phoneMarked = await authService.markPhoneVerified();
+      if (!phoneMarked) throw StateError(strings.otpVerificationFailed);
 
       // --------------------------------------------------------
       // TOUT EST OK
@@ -402,6 +353,7 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         loading = false;
       });
+      _registrationFinished = true;
 
       Navigator.pushAndRemoveUntil(
         context,
@@ -418,9 +370,11 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       _showMessage(
-        'Impossible de terminer l’inscription.',
+        strings.registrationFailed,
         error: true,
       );
+    } finally {
+      _finishingRegistration = false;
     }
   }
 
@@ -449,6 +403,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor:
           const Color(0xff101010),
@@ -458,9 +413,7 @@ class _RegisterPageState extends State<RegisterPage> {
             Colors.transparent,
         elevation: 0,
 
-        title: const Text(
-          'Créer un compte',
-        ),
+        title: Text(strings.registerTitle),
 
         centerTitle: true,
         actions: const [AppLanguageSelector()],
@@ -513,8 +466,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   decoration:
                       _inputDecoration(
-                    label:
-                        'Nom complet',
+                    label: strings.fullName,
                     icon:
                         Icons.person,
                   ),
@@ -524,13 +476,11 @@ class _RegisterPageState extends State<RegisterPage> {
                         value?.trim() ?? '';
 
                     if (name.isEmpty) {
-                      return
-                          'Entrez votre nom.';
+                        return strings.nameRequired;
                     }
 
                     if (name.length < 2) {
-                      return
-                          'Nom trop court.';
+                        return strings.nameTooShort;
                     }
 
                     return null;
@@ -568,8 +518,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         value?.trim() ?? '';
 
                     if (email.isEmpty) {
-                      return
-                          'Entrez votre adresse e-mail.';
+                        return strings.requiredEmail;
                     }
 
                     final regex = RegExp(
@@ -578,8 +527,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                     if (!regex.hasMatch(
                         email)) {
-                      return
-                          'Adresse e-mail invalide.';
+                        return strings.invalidEmail;
                     }
 
                     return null;
@@ -606,8 +554,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   decoration:
                       _inputDecoration(
-                    label:
-                        'Numéro de téléphone',
+                    label: strings.enterPhoneNumber,
                     icon:
                         Icons.phone,
                     hint:
@@ -615,32 +562,18 @@ class _RegisterPageState extends State<RegisterPage> {
                   ),
 
                   validator: (value) {
-                    final phone =
-                        value?.trim() ?? '';
+                    final phone = PhoneNumberUtils.normalize(
+                      value ?? '',
+                    );
 
                     if (phone.isEmpty) {
-                      return
-                          'Entrez votre numéro.';
+                      return strings.phoneNumberRequired;
                     }
 
-                    if (!phone.startsWith('+')) {
-                      return
-                          'Utilisez le format international : +225...';
-                    }
-
-                    final digits =
-                        phone.substring(1);
-
-                    if (!RegExp(r'^\d+$')
-                        .hasMatch(digits)) {
-                      return
-                          'Le numéro contient des caractères invalides.';
-                    }
-
-                    if (digits.length < 8 ||
-                        digits.length > 15) {
-                      return
-                          'Numéro de téléphone invalide.';
+                    if (!PhoneNumberUtils.isValid(phone)) {
+                      return phone.startsWith('+')
+                          ? strings.invalidPhoneNumber
+                          : strings.phoneInternationalFormat;
                     }
 
                     return null;
@@ -667,8 +600,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   decoration:
                       _inputDecoration(
-                    label:
-                        'Mot de passe',
+                    label: strings.password,
                     icon:
                         Icons.lock,
 
@@ -694,13 +626,11 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty) {
-                      return
-                          'Entrez un mot de passe.';
+                        return strings.requiredPassword;
                     }
 
                     if (value.length < 6) {
-                      return
-                          'Minimum 6 caractères.';
+                        return strings.passwordTooShort;
                     }
 
                     return null;
@@ -727,8 +657,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   decoration:
                       _inputDecoration(
-                    label:
-                        'Confirmer le mot de passe',
+                    label: strings.confirmPassword,
 
                     icon:
                         Icons.lock_outline,
@@ -755,15 +684,13 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: (value) {
                     if (value == null ||
                         value.isEmpty) {
-                      return
-                          'Confirmez le mot de passe.';
+                        return strings.confirmPasswordRequired;
                     }
 
                     if (value !=
                         passwordController
                             .text) {
-                      return
-                          'Les mots de passe ne correspondent pas.';
+                        return strings.passwordMismatch;
                     }
 
                     return null;
@@ -817,10 +744,9 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           )
 
-                        : const Text(
-                            'Créer un compte',
-
-                            style:
+                        : Text(
+                          strings.signUp,
+                          style:
                                 TextStyle(
                               color:
                                   Colors.white,
@@ -851,7 +777,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                   child:
                       const Text(
-                    'J’ai déjà un compte',
+                    strings.signIn,
 
                     style:
                         TextStyle(

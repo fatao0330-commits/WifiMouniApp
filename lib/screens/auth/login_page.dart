@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'register_page.dart';
+import 'forgot_password_phone_page.dart';
 import '../home/home_page.dart';
 import '../../widgets/app_language_selector.dart';
 import '../../l10n/app_localizations.dart';
@@ -139,74 +140,16 @@ class _LoginPageState extends State<LoginPage> {
   // ==========================================================
 
   Future<void> _forgotPassword() async {
-    final email = _emailController.text.trim();
-
-    if (email.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Entrez votre adresse email.',
-          ),
-        ),
-      );
-      return;
-    }
-
-    try {
-      await _auth.sendPasswordResetEmail(
-        email: email,
-      );
-
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Un email de réinitialisation a été envoyé.',
-          ),
-        ),
-      );
-    } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-
-      String message;
-
-      switch (e.code) {
-        case 'invalid-email':
-          message = 'Adresse email invalide.';
-          break;
-
-        case 'user-not-found':
-          message =
-              'Aucun compte trouvé avec cette adresse.';
-          break;
-
-        case 'too-many-requests':
-          message =
-              'Trop de demandes. Réessayez plus tard.';
-          break;
-
-        default:
-          message =
-              'Impossible d’envoyer le lien de réinitialisation.';
-      }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-        ),
-      );
-    } catch (_) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Une erreur est survenue.',
-          ),
-        ),
-      );
-    }
+    final reset = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ForgotPasswordPhonePage(),
+      ),
+    );
+    if (!mounted || reset != true) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(AppLocalizations.of(context).passwordResetSuccess)),
+    );
   }
 
   // ==========================================================

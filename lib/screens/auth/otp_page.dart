@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/auth_service.dart';
+import '../../l10n/app_localizations.dart';
 
 class OtpPage extends StatefulWidget {
   final String verificationId;
@@ -43,10 +44,11 @@ class _OtpPageState extends State<OtpPage> {
   // ============================================================
 
   Future<void> _verifyCode() async {
-    if (!_formKey.currentState!.validate()) {
+    if (_formKey.currentState?.validate() != true) {
       return;
     }
 
+    final strings = AppLocalizations.of(context);
     FocusScope.of(context).unfocus();
 
     setState(() {
@@ -70,8 +72,7 @@ class _OtpPageState extends State<OtpPage> {
       if (user == null) {
         throw FirebaseAuthException(
           code: 'no-current-user',
-          message:
-              'Utilisateur introuvable.',
+            message: strings.accountSessionMissing,
         );
       }
 
@@ -87,8 +88,10 @@ class _OtpPageState extends State<OtpPage> {
       // ENREGISTRER LA VÉRIFICATION DANS FIRESTORE
       // ========================================================
 
-      await _authService
-          .markPhoneVerified();
+      final phoneMarked = await _authService.markPhoneVerified();
+      if (!phoneMarked) {
+        throw StateError(strings.otpVerificationFailed);
+      }
 
       if (!mounted) return;
 
@@ -97,7 +100,7 @@ class _OtpPageState extends State<OtpPage> {
       });
 
       _showMessage(
-        'Code correct. Votre numéro est vérifié.',
+        strings.phoneVerified,
       );
 
       // Retour vers RegisterPage
@@ -112,38 +115,30 @@ class _OtpPageState extends State<OtpPage> {
         loading = false;
       });
 
-      String message;
+      String message = strings.otpVerificationFailed;
 
       switch (e.code) {
         case 'invalid-verification-code':
-          message =
-              'Code incorrect. Vérifiez le SMS et réessayez.';
           break;
 
         case 'invalid-verification-id':
-          message =
-              'Le code de vérification a expiré. Demandez un nouveau code.';
+            message = strings.otpExpired;
           break;
 
         case 'credential-already-in-use':
-          message =
-              'Ce numéro de téléphone est déjà utilisé par un autre compte.';
+            message = strings.phoneAlreadyInUse;
           break;
 
         case 'provider-already-linked':
-          message =
-              'Ce numéro est déjà vérifié.';
+            message = strings.phoneVerified;
           break;
 
         case 'too-many-requests':
-          message =
-              'Trop de tentatives. Réessayez plus tard.';
+            message = strings.otpVerificationFailed;
           break;
 
         default:
-          message =
-              e.message ??
-                  'Impossible de vérifier le code.';
+            message = strings.otpVerificationFailed;
       }
 
       _showMessage(
@@ -158,7 +153,7 @@ class _OtpPageState extends State<OtpPage> {
       });
 
       _showMessage(
-        'Une erreur est survenue pendant la vérification.',
+        strings.otpVerificationFailed,
         error: true,
       );
     }
@@ -192,6 +187,7 @@ class _OtpPageState extends State<OtpPage> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor:
           const Color(0xff101010),
@@ -200,9 +196,7 @@ class _OtpPageState extends State<OtpPage> {
         backgroundColor:
             Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'Vérification',
-        ),
+        title: Text(strings.phoneVerificationTitle),
         centerTitle: true,
       ),
 
@@ -225,8 +219,8 @@ class _OtpPageState extends State<OtpPage> {
 
               const SizedBox(height: 25),
 
-              const Text(
-                'Vérifiez votre numéro',
+              Text(
+                strings.phoneVerificationTitle,
                 textAlign:
                     TextAlign.center,
                 style: TextStyle(
@@ -240,7 +234,7 @@ class _OtpPageState extends State<OtpPage> {
               const SizedBox(height: 15),
 
               Text(
-                'Un code de vérification a été envoyé au numéro :\n${widget.phoneNumber}',
+                '${strings.otpSent}\n${widget.phoneNumber}',
                 textAlign:
                     TextAlign.center,
                 style: const TextStyle(
@@ -275,7 +269,7 @@ class _OtpPageState extends State<OtpPage> {
                 decoration:
                     InputDecoration(
                   labelText:
-                      'Code SMS',
+                      strings.smsCode,
                   labelStyle:
                       const TextStyle(
                     color: Colors.grey,
@@ -299,11 +293,11 @@ class _OtpPageState extends State<OtpPage> {
                       value?.trim() ?? '';
 
                   if (code.isEmpty) {
-                    return 'Entrez le code reçu.';
+                    return strings.otpRequired;
                   }
 
                   if (code.length != 6) {
-                    return 'Le code doit contenir 6 chiffres.';
+                    return strings.firebaseOtpInvalid;
                   }
 
                   return null;
@@ -346,8 +340,8 @@ class _OtpPageState extends State<OtpPage> {
                             strokeWidth: 2,
                           ),
                         )
-                      : const Text(
-                          'Vérifier le code',
+                        : Text(
+                          strings.verifyCode,
                           style:
                               TextStyle(
                             color:
@@ -363,8 +357,8 @@ class _OtpPageState extends State<OtpPage> {
 
               const SizedBox(height: 25),
 
-              const Text(
-                'Si vous ne recevez pas le SMS, vérifiez que le numéro est correct et que votre téléphone peut recevoir des SMS.',
+              Text(
+                strings.otpHelp,
                 textAlign:
                     TextAlign.center,
                 style: TextStyle(

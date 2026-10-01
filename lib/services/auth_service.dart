@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../utils/phone_number_utils.dart';
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
@@ -72,7 +74,10 @@ class AuthService {
     try {
       final cleanName = nom.trim();
       final cleanEmail = email.trim().toLowerCase();
-      final cleanPhone = telephone.trim();
+      final cleanPhone = PhoneNumberUtils.normalize(telephone);
+      if (!PhoneNumberUtils.isValid(cleanPhone)) {
+        return 'invalidPhoneNumber';
+      }
 
       // --------------------------------------------------------
       // 1. CRÉER LE COMPTE FIREBASE AUTH
@@ -87,7 +92,7 @@ class AuthService {
       createdUser = credential.user;
 
       if (createdUser == null) {
-        return 'Impossible de créer le compte.';
+        return 'registrationFailed';
       }
 
       final uid = createdUser.uid;
@@ -166,17 +171,6 @@ class AuthService {
             FieldValue.serverTimestamp(),
       });
 
-      // --------------------------------------------------------
-      // 5. ENVOYER L'E-MAIL DE VÉRIFICATION
-      // --------------------------------------------------------
-
-      try {
-        await createdUser.sendEmailVerification();
-      } catch (_) {
-        // L'inscription reste valide même si
-        // l'envoi de l'e-mail échoue temporairement.
-      }
-
       return null;
     } on FirebaseAuthException catch (e) {
       // --------------------------------------------------------
@@ -185,23 +179,22 @@ class AuthService {
 
       switch (e.code) {
         case 'email-already-in-use':
-          return 'Cette adresse e-mail est déjà utilisée.';
+          return 'email-already-in-use';
 
         case 'invalid-email':
-          return 'Adresse e-mail invalide.';
+          return 'invalid-email';
 
         case 'weak-password':
-          return 'Le mot de passe est trop faible.';
+          return 'weak-password';
 
         case 'operation-not-allowed':
-          return 'L’inscription par e-mail n’est pas activée dans Firebase.';
+          return 'operation-not-allowed';
 
         case 'network-request-failed':
-          return 'Problème de connexion Internet.';
+          return 'network-request-failed';
 
         default:
-          return e.message ??
-              'Impossible de créer le compte.';
+          return 'registrationFailed';
       }
     } catch (e) {
       // --------------------------------------------------------
@@ -215,7 +208,7 @@ class AuthService {
         } catch (_) {}
       }
 
-      return 'Erreur lors de la création du compte. Vérifiez votre connexion et réessayez.';
+      return 'registrationFailed';
     }
   }
 
@@ -270,39 +263,6 @@ class AuthService {
 
   Future<void> logout() async {
     await _auth.signOut();
-  }
-
-  // ============================================================
-  // RÉINITIALISATION DU MOT DE PASSE
-  // ============================================================
-
-  Future<String?> resetPassword(
-    String email,
-  ) async {
-    try {
-      await _auth.sendPasswordResetEmail(
-        email: email.trim().toLowerCase(),
-      );
-
-      return null;
-    } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case 'invalid-email':
-          return 'Adresse e-mail invalide.';
-
-        case 'user-not-found':
-          return 'Aucun compte trouvé avec cette adresse e-mail.';
-
-        case 'network-request-failed':
-          return 'Problème de connexion Internet.';
-
-        default:
-          return e.message ??
-              'Impossible d’envoyer le lien.';
-      }
-    } catch (_) {
-      return 'Erreur lors de la réinitialisation.';
-    }
   }
 
   // ============================================================

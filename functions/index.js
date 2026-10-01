@@ -258,6 +258,264 @@ function getIdentifier(data) {
   ).trim();
 }
 
+async function findUserByTelephone(phone, identifier) {
+  const candidates = [...new Set([phone, String(identifier || "").trim()])];
+  for (const candidate of candidates) {
+    if (!candidate) continue;
+    const snapshot = await db
+      .collection("users")
+      .where("telephone", "==", candidate)
+      .limit(1)
+      .get();
+    if (!snapshot.empty) return snapshot;
+  }
+  return null;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RÉINITIALISATION DU MOT DE PASSE PAR TÉLÉPHONE
+|--------------------------------------------------------------------------
+*/
+
+exports.requestPasswordReset = onCall(
+  {
+    region: "us-central1",
+    secrets: [INFOBIP_API_KEY],
+  },
+  async (request) => {
+    try {
+      const identifier = getIdentifier(request.data);
+      const phone = normalizePhone(identifier);
+
+      if (!phone) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Numéro de téléphone invalide.",
+        );
+      }
+
+      const userSnapshot = await findUserByTelephone(phone, identifier);
+      if (!userSnapshot) {
+        throw new HttpsError(
+          "not-found",
+          "Aucun compte associé à ce numéro.",
+        );
+      }
+
+      const user = userSnapshot.docs[0];
+      const result = await infobipRequest(
+        "/2fa/2/pin",
+        {
+          method: "POST",
+          body: {
+            applicationId: INFOBIP_APPLICATION_ID,
+            messageId: INFOBIP_MESSAGE_ID,
+            from: INFOBIP_SENDER,
+            to: phone,
+          },
+        },
+      );
+
+      if (!result?.pinId) {
+        throw new Error("Infobip n'a pas retourné de pinId.");
+      }
+
+      await db.collection("phone_password_resets").doc(user.id).set({
+        uid: user.id,
+        phone,
+        pinId: result.pinId,
+        status: "pending",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        expiresAt: admin.firestore.Timestamp.fromMillis(
+          Date.now() + RESET_CODE_EXPIRATION_MINUTES * 60 * 1000,
+        ),
+      });
+
+      return {
+        success: true,
+        maskedDestination: maskPhone(phone),
+      };
+    } catch (error) {
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      console.error("requestPasswordReset error:", error);
+      throw new HttpsError(
+        "internal",
+        "Impossible d'envoyer le code de vérification.",
+      );
+    }
+  },
+);
+
+
+exports.verifyPasswordResetCode = onCall(
+  {
+    region: "us-central1",
+    secrets: [INFOBIP_API_KEY],
+  },
+  async (request) => {
+    try {
+      const identifier = getIdentifier(request.data);
+      const phone = normalizePhone(identifier);
+      const code = String(request.data?.code || "").trim();
+
+      if (!phone || !/^\d{4}$/.test(code)) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Code de vérification invalide.",
+        );
+      }
+
+      const userSnapshot = await findUserByTelephone(phone, identifier);
+      if (!userSnapshot) {
+        throw new HttpsError(
+          "not-found",
+          "Aucun compte associé à ce numéro.",
+        );
+      }
+
+      const uid = userSnapshot.docs[0].id;
+      const resetRef = db.collection("phone_password_resets").doc(uid);
+      const resetSnapshot = await resetRef.get();
+
+      if (!resetSnapshot.exists) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Aucune demande de réinitialisation en cours.",
+        );
+      }
+
+      const reset = resetSnapshot.data();
+      if (reset.phone !== phone || reset.status !== "pending") {
+        throw new HttpsError(
+          "failed-precondition",
+          "Cette demande de réinitialisation n'est plus valide.",
+        );
+      }
+
+      if (!reset.expiresAt || reset.expiresAt.toMillis() < Date.now()) {
+        await resetRef.update({status: "expired"});
+        throw new HttpsError(
+          "deadline-exceeded",
+          "Le code de vérification a expiré.",
+        );
+      }
+
+      const verification = await infobipRequest(
+        `/2fa/2/pin/${encodeURIComponent(reset.pinId)}/verify`,
+        {method: "POST", body: {pin: code}},
+      );
+      const verified = verification?.verified === true ||
+        verification?.status === "VERIFIED" ||
+        verification?.status === "verified";
+
+      if (!verified) {
+        throw new HttpsError(
+          "permission-denied",
+          "Code de vérification incorrect.",
+        );
+      }
+
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      await resetRef.update({
+        status: "verified",
+        resetTokenHash: hashToken(resetToken),
+        verifiedAt: admin.firestore.FieldValue.serverTimestamp(),
+        resetTokenExpiresAt: admin.firestore.Timestamp.fromMillis(
+          Date.now() + RESET_TOKEN_EXPIRATION_MINUTES * 60 * 1000,
+        ),
+      });
+
+      return {success: true, resetToken};
+    } catch (error) {
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      console.error("verifyPasswordResetCode error:", error);
+      throw new HttpsError(
+        "internal",
+        "Impossible de vérifier le code.",
+      );
+    }
+  },
+);
+
+
+exports.resetPasswordByPhone = onCall(
+  {region: "us-central1"},
+  async (request) => {
+    try {
+      const phone = normalizePhone(getIdentifier(request.data));
+      const resetToken = String(request.data?.resetToken || "").trim();
+      const newPassword = String(request.data?.newPassword || "");
+
+      if (!phone || !resetToken || newPassword.length < 6) {
+        throw new HttpsError(
+          "invalid-argument",
+          "Numéro, code de vérification ou mot de passe invalide.",
+        );
+      }
+
+      const userSnapshot = await findUserByTelephone(
+        phone,
+        getIdentifier(request.data),
+      );
+      if (!userSnapshot) {
+        throw new HttpsError(
+          "not-found",
+          "Aucun compte associé à ce numéro.",
+        );
+      }
+
+      const uid = userSnapshot.docs[0].id;
+      const resetRef = db.collection("phone_password_resets").doc(uid);
+      const resetSnapshot = await resetRef.get();
+      if (!resetSnapshot.exists) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Aucune vérification valide.",
+        );
+      }
+
+      const reset = resetSnapshot.data();
+      if (
+        reset.phone !== phone ||
+        reset.status !== "verified" ||
+        !reset.resetTokenExpiresAt ||
+        reset.resetTokenExpiresAt.toMillis() < Date.now() ||
+        !safeEqual(hashToken(resetToken), reset.resetTokenHash || "")
+      ) {
+        throw new HttpsError(
+          "permission-denied",
+          "La vérification a expiré. Demandez un nouveau code.",
+        );
+      }
+
+      await admin.auth().updateUser(uid, {password: newPassword});
+      await resetRef.update({
+        status: "completed",
+        resetTokenHash: admin.firestore.FieldValue.delete(),
+        resetTokenExpiresAt: admin.firestore.FieldValue.delete(),
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return {success: true};
+    } catch (error) {
+      if (error instanceof HttpsError) {
+        throw error;
+      }
+      console.error("resetPasswordByPhone error:", error);
+      throw new HttpsError(
+        "internal",
+        "Impossible de réinitialiser le mot de passe.",
+      );
+    }
+  },
+);
+
 
 /*
 |--------------------------------------------------------------------------
