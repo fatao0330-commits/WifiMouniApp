@@ -24,6 +24,7 @@ dependencies:
   share_plus: ^11.0.0
   cloud_functions: ^5.6.0
   app_links: ^6.4.1
+  url_launcher: ^6.3.2
 
   # Autres packages
   provider: ^6.1.2

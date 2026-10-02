@@ -22,6 +22,96 @@ class AppLocalizations {
   bool get _isFrench => locale.languageCode == 'fr';
   String _text(String french, String english) => _isFrench ? french : english;
 
+  static const _additionalTexts = <String, Map<String, String>>{
+    'es': {
+      'contactByEmail': 'Contactar con soporte por correo', 'contactViaWhatsApp': 'Contactar con soporte por WhatsApp',
+      'emailLaunchFailed': 'No se pudo abrir la aplicación de correo.', 'whatsappLaunchFailed': 'No se pudo abrir WhatsApp.',
+      'cameraPermissionDenied': 'Permite el acceso a la cámara en los ajustes para escanear un código QR.', 'cameraUnavailable': 'La cámara no está disponible. Comprueba los permisos e inténtalo de nuevo.',
+      'retry': 'Reintentar', 'invalidQrCode': 'Código QR no válido.', 'qrUserNotFound': 'No se encontró al usuario.', 'qrLookupFailed': 'No se pudo verificar el código QR.',
+      'qrUserFound': 'Usuario encontrado', 'scanAgain': 'Escanear otro código QR', 'qrVerifying': 'Verificando...', 'qrScannerHint': 'Coloca el código QR de WiFi Mouni dentro del marco.',
+    },
+    'ar': {
+      'contactByEmail': 'مراسلة الدعم عبر البريد الإلكتروني', 'contactViaWhatsApp': 'التواصل مع الدعم عبر WhatsApp',
+      'emailLaunchFailed': 'تعذر فتح تطبيق البريد الإلكتروني.', 'whatsappLaunchFailed': 'تعذر فتح WhatsApp.',
+      'cameraPermissionDenied': 'اسمح بالوصول إلى الكاميرا من الإعدادات لمسح رمز QR.', 'cameraUnavailable': 'الكاميرا غير متاحة. تحقق من الأذونات ثم حاول مجددًا.',
+      'retry': 'إعادة المحاولة', 'invalidQrCode': 'رمز QR غير صالح.', 'qrUserNotFound': 'لم يتم العثور على المستخدم.', 'qrLookupFailed': 'تعذر التحقق من رمز QR.',
+      'qrUserFound': 'تم العثور على المستخدم', 'scanAgain': 'مسح رمز QR آخر', 'qrVerifying': 'جارٍ التحقق...', 'qrScannerHint': 'ضع رمز WiFi Mouni QR داخل الإطار.',
+    },
+    'pt': {
+      'contactByEmail': 'Falar com o suporte por e-mail', 'contactViaWhatsApp': 'Falar com o suporte pelo WhatsApp',
+      'emailLaunchFailed': 'Não foi possível abrir o aplicativo de e-mail.', 'whatsappLaunchFailed': 'Não foi possível abrir o WhatsApp.',
+      'cameraPermissionDenied': 'Permita o acesso à câmera nas configurações para ler um código QR.', 'cameraUnavailable': 'A câmera está indisponível. Verifique as permissões e tente novamente.',
+      'retry': 'Tentar novamente', 'invalidQrCode': 'Código QR inválido.', 'qrUserNotFound': 'Usuário não encontrado.', 'qrLookupFailed': 'Não foi possível verificar o código QR.',
+      'qrUserFound': 'Usuário encontrado', 'scanAgain': 'Ler outro código QR', 'qrVerifying': 'Verificando...', 'qrScannerHint': 'Posicione o código QR do WiFi Mouni dentro da moldura.',
+    },
+    'hi': {
+      'contactByEmail': 'ईमेल से सहायता टीम से संपर्क करें', 'contactViaWhatsApp': 'WhatsApp पर सहायता टीम से संपर्क करें',
+      'emailLaunchFailed': 'ईमेल ऐप नहीं खुल सका।', 'whatsappLaunchFailed': 'WhatsApp नहीं खुल सका।',
+      'cameraPermissionDenied': 'QR कोड स्कैन करने के लिए सेटिंग्स में कैमरा अनुमति दें।', 'cameraUnavailable': 'कैमरा उपलब्ध नहीं है। अनुमति जाँचकर फिर प्रयास करें।',
+      'retry': 'फिर से प्रयास करें', 'invalidQrCode': 'QR कोड अमान्य है।', 'qrUserNotFound': 'उपयोगकर्ता नहीं मिला।', 'qrLookupFailed': 'QR कोड सत्यापित नहीं हो सका।',
+      'qrUserFound': 'उपयोगकर्ता मिल गया', 'scanAgain': 'दूसरा QR कोड स्कैन करें', 'qrVerifying': 'सत्यापन हो रहा है...', 'qrScannerHint': 'WiFi Mouni QR कोड को फ्रेम के अंदर रखें।',
+    },
+    'de': {
+      'contactByEmail': 'Support per E-Mail kontaktieren', 'contactViaWhatsApp': 'Support über WhatsApp kontaktieren',
+      'emailLaunchFailed': 'Die E-Mail-App konnte nicht geöffnet werden.', 'whatsappLaunchFailed': 'WhatsApp konnte nicht geöffnet werden.',
+      'cameraPermissionDenied': 'Erlaube den Kamerazugriff in den Einstellungen, um einen QR-Code zu scannen.', 'cameraUnavailable': 'Die Kamera ist nicht verfügbar. Prüfe die Berechtigungen und versuche es erneut.',
+      'retry': 'Erneut versuchen', 'invalidQrCode': 'Ungültiger QR-Code.', 'qrUserNotFound': 'Benutzer nicht gefunden.', 'qrLookupFailed': 'Der QR-Code konnte nicht überprüft werden.',
+      'qrUserFound': 'Benutzer gefunden', 'scanAgain': 'Weiteren QR-Code scannen', 'qrVerifying': 'Wird überprüft...', 'qrScannerHint': 'Halte den WiFi-Mouni-QR-Code in den Rahmen.',
+    },
+    'ja': {
+      'contactByEmail': 'メールでサポートに問い合わせ', 'contactViaWhatsApp': 'WhatsAppでサポートに問い合わせ',
+      'emailLaunchFailed': 'メールアプリを開けませんでした。', 'whatsappLaunchFailed': 'WhatsAppを開けませんでした。',
+      'cameraPermissionDenied': 'QRコードをスキャンするには、設定でカメラへのアクセスを許可してください。', 'cameraUnavailable': 'カメラを利用できません。権限を確認して再試行してください。',
+      'retry': '再試行', 'invalidQrCode': 'QRコードが無効です。', 'qrUserNotFound': 'ユーザーが見つかりません。', 'qrLookupFailed': 'QRコードを確認できませんでした。',
+      'qrUserFound': 'ユーザーが見つかりました', 'scanAgain': '別のQRコードをスキャン', 'qrVerifying': '確認中...', 'qrScannerHint': 'WiFi MouniのQRコードを枠内に合わせてください。',
+    },
+    'ru': {
+      'contactByEmail': 'Написать в поддержку по электронной почте', 'contactViaWhatsApp': 'Связаться с поддержкой в WhatsApp',
+      'emailLaunchFailed': 'Не удалось открыть почтовое приложение.', 'whatsappLaunchFailed': 'Не удалось открыть WhatsApp.',
+      'cameraPermissionDenied': 'Разрешите доступ к камере в настройках, чтобы сканировать QR-код.', 'cameraUnavailable': 'Камера недоступна. Проверьте разрешения и повторите попытку.',
+      'retry': 'Повторить', 'invalidQrCode': 'Недействительный QR-код.', 'qrUserNotFound': 'Пользователь не найден.', 'qrLookupFailed': 'Не удалось проверить QR-код.',
+      'qrUserFound': 'Пользователь найден', 'scanAgain': 'Сканировать другой QR-код', 'qrVerifying': 'Проверка...', 'qrScannerHint': 'Поместите QR-код WiFi Mouni в рамку.',
+    },
+    'zh': {
+      'contactByEmail': '通过电子邮件联系支持团队', 'contactViaWhatsApp': '通过 WhatsApp 联系支持团队',
+      'emailLaunchFailed': '无法打开邮件应用。', 'whatsappLaunchFailed': '无法打开 WhatsApp。',
+      'cameraPermissionDenied': '请在设置中允许使用相机，以扫描二维码。', 'cameraUnavailable': '相机不可用。请检查权限后重试。',
+      'retry': '重试', 'invalidQrCode': '二维码无效。', 'qrUserNotFound': '未找到用户。', 'qrLookupFailed': '无法验证二维码。',
+      'qrUserFound': '已找到用户', 'scanAgain': '扫描另一个二维码', 'qrVerifying': '正在验证...', 'qrScannerHint': '将 WiFi Mouni 二维码对准取景框。',
+    },
+    'it': {
+      'contactByEmail': "Contatta l'assistenza via e-mail", 'contactViaWhatsApp': "Contatta l'assistenza su WhatsApp",
+      'emailLaunchFailed': "Impossibile aprire l'app di posta.", 'whatsappLaunchFailed': 'Impossibile aprire WhatsApp.',
+      'cameraPermissionDenied': "Consenti l'accesso alla fotocamera nelle impostazioni per scansionare un codice QR.", 'cameraUnavailable': 'Fotocamera non disponibile. Controlla le autorizzazioni e riprova.',
+      'retry': 'Riprova', 'invalidQrCode': 'Codice QR non valido.', 'qrUserNotFound': 'Utente non trovato.', 'qrLookupFailed': 'Impossibile verificare il codice QR.',
+      'qrUserFound': 'Utente trovato', 'scanAgain': 'Scansiona un altro codice QR', 'qrVerifying': 'Verifica in corso...', 'qrScannerHint': 'Inquadra il codice QR WiFi Mouni.',
+    },
+    'tr': {
+      'contactByEmail': 'Destek ekibine e-posta gönder', 'contactViaWhatsApp': 'WhatsApp üzerinden destek al',
+      'emailLaunchFailed': 'E-posta uygulaması açılamadı.', 'whatsappLaunchFailed': 'WhatsApp açılamadı.',
+      'cameraPermissionDenied': 'QR kodu taramak için ayarlardan kamera erişimine izin verin.', 'cameraUnavailable': 'Kamera kullanılamıyor. İzinleri kontrol edip tekrar deneyin.',
+      'retry': 'Tekrar dene', 'invalidQrCode': 'QR kodu geçersiz.', 'qrUserNotFound': 'Kullanıcı bulunamadı.', 'qrLookupFailed': 'QR kodu doğrulanamadı.',
+      'qrUserFound': 'Kullanıcı bulundu', 'scanAgain': 'Başka bir QR kodu tara', 'qrVerifying': 'Doğrulanıyor...', 'qrScannerHint': 'WiFi Mouni QR kodunu çerçevenin içine yerleştirin.',
+    },
+    'ko': {
+      'contactByEmail': '이메일로 고객 지원 문의', 'contactViaWhatsApp': 'WhatsApp으로 고객 지원 문의',
+      'emailLaunchFailed': '이메일 앱을 열 수 없습니다.', 'whatsappLaunchFailed': 'WhatsApp을 열 수 없습니다.',
+      'cameraPermissionDenied': 'QR 코드를 스캔하려면 설정에서 카메라 접근을 허용하세요.', 'cameraUnavailable': '카메라를 사용할 수 없습니다. 권한을 확인한 후 다시 시도하세요.',
+      'retry': '다시 시도', 'invalidQrCode': 'QR 코드가 올바르지 않습니다.', 'qrUserNotFound': '사용자를 찾을 수 없습니다.', 'qrLookupFailed': 'QR 코드를 확인할 수 없습니다.',
+      'qrUserFound': '사용자를 찾았습니다', 'scanAgain': '다른 QR 코드 스캔', 'qrVerifying': '확인 중...', 'qrScannerHint': 'WiFi Mouni QR 코드를 프레임 안에 맞추세요.',
+    },
+    'nl': {
+      'contactByEmail': 'E-mail de ondersteuning', 'contactViaWhatsApp': 'Neem contact op via WhatsApp',
+      'emailLaunchFailed': 'De e-mailapp kon niet worden geopend.', 'whatsappLaunchFailed': 'WhatsApp kon niet worden geopend.',
+      'cameraPermissionDenied': 'Sta cameratoegang toe in de instellingen om een QR-code te scannen.', 'cameraUnavailable': 'De camera is niet beschikbaar. Controleer de machtigingen en probeer het opnieuw.',
+      'retry': 'Opnieuw proberen', 'invalidQrCode': 'Ongeldige QR-code.', 'qrUserNotFound': 'Gebruiker niet gevonden.', 'qrLookupFailed': 'De QR-code kon niet worden gecontroleerd.',
+      'qrUserFound': 'Gebruiker gevonden', 'scanAgain': 'Nog een QR-code scannen', 'qrVerifying': 'Controleren...', 'qrScannerHint': 'Richt de WiFi Mouni QR-code op het kader.',
+    },
+  };
+
+  String _newText(String key, String french, String english) =>
+      _additionalTexts[locale.languageCode]?[key] ?? _text(french, english);
+
   String get appName => 'WiFi Mouni';
   String get home => _text('Accueil', 'Home');
   String get contact => _text('Contact', 'Contact');
@@ -122,6 +212,20 @@ class AppLocalizations {
   String get phoneAlreadyInUse => _text('Ce numéro est déjà associé à un autre compte.', 'This phone number is already linked to another account.');
   String get passwordResetSuccess => _text('Votre mot de passe a été modifié.', 'Your password has been changed.');
   String get passwordResetFailed => _text('Impossible de réinitialiser le mot de passe.', 'Unable to reset the password.');
+  String get contactByEmail => _newText('contactByEmail', 'Écrire au support par e-mail', 'Email support');
+  String get contactViaWhatsApp => _newText('contactViaWhatsApp', 'Contacter le support sur WhatsApp', 'Contact support on WhatsApp');
+  String get emailLaunchFailed => _newText('emailLaunchFailed', 'Impossible d’ouvrir l’application de messagerie.', 'Unable to open the email app.');
+  String get whatsappLaunchFailed => _newText('whatsappLaunchFailed', 'Impossible d’ouvrir WhatsApp.', 'Unable to open WhatsApp.');
+  String get cameraPermissionDenied => _newText('cameraPermissionDenied', 'Autorisez l’accès à la caméra dans les réglages pour scanner un QR Code.', 'Allow camera access in settings to scan a QR code.');
+  String get cameraUnavailable => _newText('cameraUnavailable', 'La caméra est indisponible. Vérifiez ses autorisations puis réessayez.', 'The camera is unavailable. Check its permissions and try again.');
+  String get retry => _newText('retry', 'Réessayer', 'Try again');
+  String get invalidQrCode => _newText('invalidQrCode', 'QR Code invalide.', 'Invalid QR code.');
+  String get qrUserNotFound => _newText('qrUserNotFound', 'Utilisateur introuvable.', 'User not found.');
+  String get qrLookupFailed => _newText('qrLookupFailed', 'Impossible de vérifier le QR Code.', 'Unable to verify the QR code.');
+  String get qrUserFound => _newText('qrUserFound', 'Utilisateur trouvé', 'User found');
+  String get scanAgain => _newText('scanAgain', 'Scanner un autre QR Code', 'Scan another QR code');
+  String get qrVerifying => _newText('qrVerifying', 'Vérification...', 'Verifying...');
+  String get qrScannerHint => _newText('qrScannerHint', 'Placez le QR Code WiFi Mouni dans le cadre.', 'Place the WiFi Mouni QR code inside the frame.');
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

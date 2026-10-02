@@ -326,31 +326,7 @@ class _RechargePageState extends State<RechargePage> {
                                       30,
                                     ),
 
-                                    child:
-                                        Image.asset(
-                                      "assets/logos/${method.logo}",
-
-                                      width: 42,
-                                      height: 42,
-
-                                      fit: BoxFit
-                                          .contain,
-
-                                      errorBuilder:
-                                          (
-                                        _,
-                                        __,
-                                        ___,
-                                      ) {
-                                        return const Icon(
-                                          Icons
-                                              .account_balance_wallet,
-                                          color:
-                                              Colors.blue,
-                                          size: 30,
-                                        );
-                                      },
-                                    ),
+                                    child: _paymentLogo(method.logo),
                                   ),
                                 ),
 
@@ -390,6 +366,31 @@ class _RechargePageState extends State<RechargePage> {
                                               Colors.grey,
                                         ),
                                       ),
+                                      if (method.type.isNotEmpty) ...[
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          method.type,
+                                          style: const TextStyle(color: Colors.grey),
+                                        ),
+                                      ],
+                                      if (method.description.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(method.description),
+                                      ],
+                                      if (method.accountName.isNotEmpty ||
+                                          method.phoneNumber.isNotEmpty ||
+                                          method.accountNumber.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          [method.accountName, method.phoneNumber, method.accountNumber]
+                                              .where((value) => value.isNotEmpty)
+                                              .join(' • '),
+                                        ),
+                                      ],
+                                      if (method.instructions.isNotEmpty) ...[
+                                        const SizedBox(height: 4),
+                                        Text(method.instructions),
+                                      ],
                                     ],
                                   ),
                                 ),
@@ -708,6 +709,42 @@ class _RechargePageState extends State<RechargePage> {
   // ============================================================
   // CARTE ERREUR
   // ============================================================
+
+  Widget _paymentLogo(String value) {
+    final logo = value.trim();
+    if (logo.isEmpty) return _paymentLogoFallback();
+
+    final uri = Uri.tryParse(logo);
+    final isNetworkImage = uri != null &&
+        (uri.scheme == 'https' || uri.scheme == 'http') &&
+        uri.host.isNotEmpty;
+
+    final assetPath = logo.startsWith('assets/') ? logo : 'assets/logos/$logo';
+    if (isNetworkImage) {
+      return Image.network(
+        logo,
+        width: 42,
+        height: 42,
+        fit: BoxFit.contain,
+        errorBuilder: (_, __, ___) => _paymentLogoFallback(),
+      );
+    }
+    return Image.asset(
+      assetPath,
+      width: 42,
+      height: 42,
+      fit: BoxFit.contain,
+      errorBuilder: (_, __, ___) => _paymentLogoFallback(),
+    );
+  }
+
+  Widget _paymentLogoFallback() {
+    return const Icon(
+      Icons.account_balance_wallet,
+      color: Colors.blue,
+      size: 30,
+    );
+  }
 
   Widget _buildError(
     String message,

@@ -98,5 +98,19 @@
   "otpSendFailed": "SMS कोड नहीं भेजा जा सका।",
   "phoneAlreadyInUse": "यह नंबर पहले से दूसरे खाते से जुड़ा है।",
   "passwordResetSuccess": "आपका पासवर्ड बदल दिया गया है।",
-  "passwordResetFailed": "पासवर्ड रीसेट नहीं हो सका।"
+  "passwordResetFailed": "पासवर्ड रीसेट नहीं हो सका।",
+  "contactByEmail": "ईमेल से सहायता टीम से संपर्क करें",
+  "contactViaWhatsApp": "WhatsApp पर सहायता टीम से संपर्क करें",
+  "emailLaunchFailed": "ईमेल ऐप नहीं खुल सका।",
+  "whatsappLaunchFailed": "WhatsApp नहीं खुल सका।",
+  "cameraPermissionDenied": "QR कोड स्कैन करने के लिए सेटिंग्स में कैमरा अनुमति दें।",
+  "cameraUnavailable": "कैमरा उपलब्ध नहीं है। अनुमति जाँचकर फिर प्रयास करें।",
+  "retry": "फिर से प्रयास करें",
+  "invalidQrCode": "QR कोड अमान्य है।",
+  "qrUserNotFound": "उपयोगकर्ता नहीं मिला।",
+  "qrLookupFailed": "QR कोड सत्यापित नहीं हो सका।",
+  "qrUserFound": "उपयोगकर्ता मिल गया",
+  "scanAgain": "दूसरा QR कोड स्कैन करें",
+  "qrVerifying": "सत्यापन हो रहा है...",
+  "qrScannerHint": "WiFi Mouni QR कोड को फ्रेम के अंदर रखें।"
 }

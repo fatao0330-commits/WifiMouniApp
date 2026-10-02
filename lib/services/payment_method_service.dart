@@ -12,7 +12,6 @@ class PaymentMethodService {
         .map((snapshot) {
       final methods = snapshot.docs
           .map((doc) => PaymentMethodModel.fromMap(doc.id, doc.data()))
-          .where((method) => method.actif && (method.pays.isEmpty || method.pays.toUpperCase() == 'CI'))
           .toList();
       methods.sort((a, b) => a.ordre.compareTo(b.ordre));
       return methods;

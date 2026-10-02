@@ -129,5 +129,19 @@
   "otpSendFailed": "De sms-code kon niet worden verzonden.",
   "phoneAlreadyInUse": "Dit nummer is al gekoppeld aan een ander account.",
   "passwordResetSuccess": "Je wachtwoord is gewijzigd.",
-  "passwordResetFailed": "Het wachtwoord kon niet opnieuw worden ingesteld."
+  "passwordResetFailed": "Het wachtwoord kon niet opnieuw worden ingesteld.",
+  "contactByEmail": "E-mail de ondersteuning",
+  "contactViaWhatsApp": "Neem contact op via WhatsApp",
+  "emailLaunchFailed": "De e-mailapp kon niet worden geopend.",
+  "whatsappLaunchFailed": "WhatsApp kon niet worden geopend.",
+  "cameraPermissionDenied": "Sta cameratoegang toe in de instellingen om een QR-code te scannen.",
+  "cameraUnavailable": "De camera is niet beschikbaar. Controleer de machtigingen en probeer het opnieuw.",
+  "retry": "Opnieuw proberen",
+  "invalidQrCode": "Ongeldige QR-code.",
+  "qrUserNotFound": "Gebruiker niet gevonden.",
+  "qrLookupFailed": "De QR-code kon niet worden gecontroleerd.",
+  "qrUserFound": "Gebruiker gevonden",
+  "scanAgain": "Nog een QR-code scannen",
+  "qrVerifying": "Controleren...",
+  "qrScannerHint": "Richt de WiFi Mouni QR-code op het kader."
 }

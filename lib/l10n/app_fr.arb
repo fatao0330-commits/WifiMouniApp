@@ -106,5 +106,19 @@
   "otpSendFailed": "Impossible d’envoyer le code SMS.",
   "phoneAlreadyInUse": "Ce numéro est déjà associé à un autre compte.",
   "passwordResetSuccess": "Votre mot de passe a été modifié.",
-  "passwordResetFailed": "Impossible de réinitialiser le mot de passe."
+  "passwordResetFailed": "Impossible de réinitialiser le mot de passe.",
+  "contactByEmail": "Écrire au support par e-mail",
+  "contactViaWhatsApp": "Contacter le support sur WhatsApp",
+  "emailLaunchFailed": "Impossible d’ouvrir l’application de messagerie.",
+  "whatsappLaunchFailed": "Impossible d’ouvrir WhatsApp.",
+  "cameraPermissionDenied": "Autorisez l’accès à la caméra dans les réglages pour scanner un QR Code.",
+  "cameraUnavailable": "La caméra est indisponible. Vérifiez ses autorisations puis réessayez.",
+  "retry": "Réessayer",
+  "invalidQrCode": "QR Code invalide.",
+  "qrUserNotFound": "Utilisateur introuvable.",
+  "qrLookupFailed": "Impossible de vérifier le QR Code.",
+  "qrUserFound": "Utilisateur trouvé",
+  "scanAgain": "Scanner un autre QR Code",
+  "qrVerifying": "Vérification...",
+  "qrScannerHint": "Placez le QR Code WiFi Mouni dans le cadre."
 }

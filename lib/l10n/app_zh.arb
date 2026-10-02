@@ -98,5 +98,19 @@
   "otpSendFailed": "无法发送短信验证码。",
   "phoneAlreadyInUse": "此号码已关联到其他账户。",
   "passwordResetSuccess": "密码已更改。",
-  "passwordResetFailed": "无法重置密码。"
+  "passwordResetFailed": "无法重置密码。",
+  "contactByEmail": "通过电子邮件联系支持团队",
+  "contactViaWhatsApp": "通过 WhatsApp 联系支持团队",
+  "emailLaunchFailed": "无法打开邮件应用。",
+  "whatsappLaunchFailed": "无法打开 WhatsApp。",
+  "cameraPermissionDenied": "请在设置中允许使用相机，以扫描二维码。",
+  "cameraUnavailable": "相机不可用。请检查权限后重试。",
+  "retry": "重试",
+  "invalidQrCode": "二维码无效。",
+  "qrUserNotFound": "未找到用户。",
+  "qrLookupFailed": "无法验证二维码。",
+  "qrUserFound": "已找到用户",
+  "scanAgain": "扫描另一个二维码",
+  "qrVerifying": "正在验证...",
+  "qrScannerHint": "将 WiFi Mouni 二维码对准取景框。"
 }

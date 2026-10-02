@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import '../../l10n/app_localizations.dart';
 
 class SupportPage extends StatelessWidget {
   const SupportPage({super.key});
@@ -7,11 +10,12 @@ class SupportPage extends StatelessWidget {
   static const String supportEmail =
       "supportwifimouni@gmail.com";
 
-  void _copyEmail(BuildContext context) {
-    Clipboard.setData(
+  Future<void> _copyEmail(BuildContext context) async {
+    await Clipboard.setData(
       const ClipboardData(text: supportEmail),
     );
 
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text(
@@ -21,8 +25,35 @@ class SupportPage extends StatelessWidget {
     );
   }
 
+  Future<void> _openEmail(BuildContext context) async {
+    final strings = AppLocalizations.of(context);
+    final uri = Uri(
+      scheme: 'mailto',
+      path: supportEmail,
+      queryParameters: const {'subject': 'WiFi Mouni Support'},
+    );
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
+        context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(strings.emailLaunchFailed)),
+      );
+    }
+  }
+
+  Future<void> _openWhatsApp(BuildContext context) async {
+    final strings = AppLocalizations.of(context);
+    final uri = Uri.parse('https://wa.me/message/GH6WBEORWXNSK1');
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication) &&
+        context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(strings.whatsappLaunchFailed)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text("Support"),
@@ -119,6 +150,27 @@ class SupportPage extends StatelessWidget {
               fontSize: 16,
             ),
             textAlign: TextAlign.justify,
+          ),
+
+          const SizedBox(height: 30),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _openEmail(context),
+              icon: const Icon(Icons.email_outlined, color: Colors.red),
+              label: Text(strings.contactByEmail),
+            ),
+          ),
+
+          const SizedBox(height: 12),
+
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () => _openWhatsApp(context),
+              icon: const Icon(Icons.chat, color: Colors.green),
+              label: Text(strings.contactViaWhatsApp),
+            ),
           ),
 
           const SizedBox(height: 30),

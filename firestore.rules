@@ -12,7 +12,7 @@ service cloud.firestore {
     }
 
     match /payment_methods/{paymentMethodId} {
-      allow read: if signedIn() && resource.data.enabled == true;
+      allow read: if signedIn();
       allow write: if false;
     }
 

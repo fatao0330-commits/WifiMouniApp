@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../settings/settings_page.dart';
-import '../auth/login_page.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -34,25 +33,15 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> _logout() async {
-    await _auth.signOut();
-
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const LoginPage(),
-      ),
-      (route) => false,
-    );
-  }
-
   Stream<DocumentSnapshot<Map<String, dynamic>>>
       _userStream() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      return Stream.error(StateError('User session unavailable'));
+    }
     return _firestore
         .collection("users")
-        .doc(_auth.currentUser!.uid)
+        .doc(user.uid)
         .snapshots();
   }
       @override
@@ -73,8 +62,10 @@ class _ProfilePageState extends State<ProfilePage> {
             );
           }
 
-          if (!snapshot.hasData ||
-              !snapshot.data!.exists) {
+            if (snapshot.hasError ||
+              !snapshot.hasData ||
+              !snapshot.data!.exists ||
+              snapshot.data!.data() == null) {
             return const Center(
               child: Text(
                 "Utilisateur introuvable.",
@@ -101,7 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
               Center(
                 child: Text(
-                  user["nom"] ?? "",
+                  user["nom"]?.toString() ?? "",
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -119,11 +110,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   leading: const Icon(Icons.badge),
                   title: const Text("ID WiFi Mouni"),
                   subtitle:
-                      Text(user["userId"] ?? ""),
+                      Text(user["userId"]?.toString() ?? ""),
                   trailing: IconButton(
                     icon: const Icon(Icons.copy),
                     onPressed: () => _copyId(
-                      user["userId"] ?? "",
+                      user["userId"]?.toString() ?? "",
                     ),
                   ),
                 ),
@@ -141,7 +132,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   title:
                       const Text("Téléphone"),
                   subtitle: Text(
-                    user["telephone"] ?? "",
+                    user["telephone"]?.toString() ?? "",
                   ),
                 ),
               ),
@@ -157,7 +148,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   leading: const Icon(Icons.email),
                   title: const Text("E-mail"),
                   subtitle:
-                      Text(user["email"] ?? ""),
+                      Text(user["email"]?.toString() ?? ""),
                 ),
               ),
 
@@ -180,28 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   );
                 },
-              ),
-
-              const SizedBox(height: 15),
-
-              OutlinedButton.icon(
-                icon: const Icon(
-                  Icons.logout,
-                  color: Colors.red,
-                ),
-                label: const Text(
-                  "Déconnexion",
-                  style: TextStyle(
-                    color: Colors.red,
-                  ),
-                ),
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(
-                    double.infinity,
-                    50,
-                  ),
-                ),
-                onPressed: _logout,
               ),
 
               const SizedBox(height: 20),

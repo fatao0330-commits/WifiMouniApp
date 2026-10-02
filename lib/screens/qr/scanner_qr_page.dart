@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../services/qr_service.dart';
 import '../subscription/buy_subscription_page.dart';
 
@@ -13,14 +14,21 @@ class ScannerQrPage extends StatefulWidget {
 
 class _ScannerQrPageState extends State<ScannerQrPage> {
   final MobileScannerController _controller =
-      MobileScannerController();
+  MobileScannerController(autoStart: false);
 
   final QrService _qrService = QrService();
 
   bool _alreadyScanned = false;
   bool _loading = false;
+  String? _cameraError;
 
   Map<String, dynamic>? _beneficiary;
+
+  @override
+  void initState() {
+    super.initState();
+    _startScanner();
+  }
 
   @override
   void dispose() {
@@ -29,7 +37,7 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
   }
 
   Future<void> _processQrCode(String code) async {
-    if (_alreadyScanned || _loading) return;
+    if (!mounted || _alreadyScanned || _loading) return;
 
     final scannedId = code.trim().toUpperCase();
 
@@ -40,9 +48,8 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
       _loading = true;
     });
 
-    await _controller.stop();
-
     try {
+      await _controller.stop();
       final user = await _qrService.findUserById(scannedId);
 
       if (!mounted) return;
@@ -54,19 +61,14 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
 
       if (user == null) {
         _showError(
-          "QR Code invalide.\nUtilisateur introuvable.",
+          '${AppLocalizations.of(context).invalidQrCode}\n${AppLocalizations.of(context).qrUserNotFound}',
         );
-
-        setState(() {
-          _alreadyScanned = false;
-        });
-
-        await _controller.start();
+        await _resumeScanner();
         return;
       }
 
-      _showBeneficiary(user);
-    } catch (e) {
+      await _showBeneficiary(user);
+    } catch (_) {
       if (!mounted) return;
 
       setState(() {
@@ -74,15 +76,35 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
       });
 
       _showError(
-        "Impossible de vérifier le QR Code.",
+        AppLocalizations.of(context).qrLookupFailed,
       );
-
-      setState(() {
-        _alreadyScanned = false;
-      });
-
-      await _controller.start();
+      await _resumeScanner();
     }
+  }
+
+  Future<void> _startScanner() async {
+    if (!mounted) return;
+    try {
+      await _controller.start();
+      if (!mounted) return;
+      setState(() => _cameraError = null);
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _cameraError = error.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _resumeScanner() async {
+    if (!mounted) return;
+    setState(() {
+      _alreadyScanned = false;
+      _beneficiary = null;
+      _loading = false;
+    });
+    await _startScanner();
   }
 
   void _showError(String message) {
@@ -94,13 +116,13 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
     );
   }
 
-  void _showBeneficiary(
+  Future<void> _showBeneficiary(
     Map<String, dynamic> user,
-  ) {
+  ) async {
     final nom = user["nom"]?.toString() ?? "";
     final userId = user["userId"]?.toString() ?? "";
 
-    showModalBottomSheet(
+    final scanAgain = await showModalBottomSheet<bool>(
       context: context,
       isDismissible: false,
       enableDrag: false,
@@ -123,8 +145,8 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
 
               const SizedBox(height: 15),
 
-              const Text(
-                "Utilisateur trouvé",
+              Text(
+                AppLocalizations.of(sheetContext).qrUserFound,
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -173,13 +195,13 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
                 height: 52,
                 child: ElevatedButton.icon(
                   icon: const Icon(Icons.wifi),
-                  label: const Text(
-                    "Acheter un abonnement",
+                  label: Text(
+                    AppLocalizations.of(sheetContext).buySubscription,
                   ),
-                  onPressed: () {
-                    Navigator.pop(sheetContext);
+                  onPressed: () async {
+                    Navigator.pop(sheetContext, false);
 
-                    Navigator.push(
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
@@ -188,6 +210,7 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
                         ),
                       ),
                     );
+                    if (mounted) await _resumeScanner();
                   },
                 ),
               ),
@@ -199,17 +222,10 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
                 height: 52,
                 child: OutlinedButton(
                   onPressed: () {
-                    Navigator.pop(sheetContext);
-
-                    setState(() {
-                      _alreadyScanned = false;
-                      _beneficiary = null;
-                    });
-
-                    _controller.start();
+                    Navigator.pop(sheetContext, true);
                   },
-                  child: const Text(
-                    "Scanner un autre QR Code",
+                  child: Text(
+                    AppLocalizations.of(sheetContext).scanAgain,
                   ),
                 ),
               ),
@@ -218,62 +234,82 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
         );
       },
     );
+    if (mounted && scanAgain != false) {
+      await _resumeScanner();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
+          onPressed: () async {
+            try {
+              await _controller.stop();
+            } catch (_) {}
+            if (mounted) await Navigator.of(context).maybePop();
           },
         ),
-        title: const Text(
-          "Scanner un QR Code",
-        ),
+        title: Text(strings.scanQrCode),
         centerTitle: true,
       ),
       body: Stack(
         children: [
-          MobileScanner(
-            controller: _controller,
-            onDetect: (capture) async {
-              if (_alreadyScanned || _loading) {
-                return;
-              }
-
-              final barcodes = capture.barcodes;
-
-              if (barcodes.isEmpty) return;
-
-              final code =
-                  barcodes.first.rawValue;
-
-              if (code == null ||
-                  code.trim().isEmpty) {
-                return;
-              }
-
-              await _processQrCode(code);
-            },
-          ),
+          if (_cameraError == null)
+            MobileScanner(
+              controller: _controller,
+              onDetect: (capture) async {
+                if (!mounted || _alreadyScanned || _loading) return;
+                final barcodes = capture.barcodes;
+                if (barcodes.isEmpty) return;
+                final code = barcodes.first.rawValue;
+                if (code == null || code.trim().isEmpty) return;
+                await _processQrCode(code);
+              },
+            )
+          else
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.camera_alt_outlined, size: 56),
+                    const SizedBox(height: 16),
+                    Text(
+                      _cameraError!.toLowerCase().contains('permission')
+                          ? strings.cameraPermissionDenied
+                          : strings.cameraUnavailable,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    FilledButton.icon(
+                      onPressed: _startScanner,
+                      icon: const Icon(Icons.refresh),
+                      label: Text(strings.retry),
+                    ),
+                  ],
+                ),
+              ),
+            ),
 
           if (_loading)
             Container(
               color: Colors.black54,
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(
+                    const CircularProgressIndicator(
                       color: Colors.white,
                     ),
-                    SizedBox(height: 15),
+                    const SizedBox(height: 15),
                     Text(
-                      "Vérification...",
-                      style: TextStyle(
+                      strings.qrVerifying,
+                      style: const TextStyle(
                         color: Colors.white,
                         fontSize: 17,
                       ),
@@ -294,8 +330,8 @@ class _ScannerQrPageState extends State<ScannerQrPage> {
                 borderRadius:
                     BorderRadius.circular(15),
               ),
-              child: const Text(
-                "Placez le QR Code WiFi Mouni dans le cadre.",
+              child: Text(
+                strings.qrScannerHint,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,

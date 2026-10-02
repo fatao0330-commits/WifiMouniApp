@@ -98,5 +98,19 @@
   "otpSendFailed": "Не удалось отправить код SMS.",
   "phoneAlreadyInUse": "Этот номер уже связан с другим аккаунтом.",
   "passwordResetSuccess": "Пароль изменён.",
-  "passwordResetFailed": "Не удалось сбросить пароль."
+  "passwordResetFailed": "Не удалось сбросить пароль.",
+  "contactByEmail": "Написать в поддержку по электронной почте",
+  "contactViaWhatsApp": "Связаться с поддержкой в WhatsApp",
+  "emailLaunchFailed": "Не удалось открыть почтовое приложение.",
+  "whatsappLaunchFailed": "Не удалось открыть WhatsApp.",
+  "cameraPermissionDenied": "Разрешите доступ к камере в настройках, чтобы сканировать QR-код.",
+  "cameraUnavailable": "Камера недоступна. Проверьте разрешения и повторите попытку.",
+  "retry": "Повторить",
+  "invalidQrCode": "Недействительный QR-код.",
+  "qrUserNotFound": "Пользователь не найден.",
+  "qrLookupFailed": "Не удалось проверить QR-код.",
+  "qrUserFound": "Пользователь найден",
+  "scanAgain": "Сканировать другой QR-код",
+  "qrVerifying": "Проверка...",
+  "qrScannerHint": "Поместите QR-код WiFi Mouni в рамку."
 }

@@ -129,5 +129,19 @@
   "otpSendFailed": "SMS kodu gönderilemedi.",
   "phoneAlreadyInUse": "Bu numara zaten başka bir hesaba bağlı.",
   "passwordResetSuccess": "Şifreniz değiştirildi.",
-  "passwordResetFailed": "Şifre sıfırlanamadı."
+  "passwordResetFailed": "Şifre sıfırlanamadı.",
+  "contactByEmail": "Destek ekibine e-posta gönder",
+  "contactViaWhatsApp": "WhatsApp üzerinden destek al",
+  "emailLaunchFailed": "E-posta uygulaması açılamadı.",
+  "whatsappLaunchFailed": "WhatsApp açılamadı.",
+  "cameraPermissionDenied": "QR kodu taramak için ayarlardan kamera erişimine izin verin.",
+  "cameraUnavailable": "Kamera kullanılamıyor. İzinleri kontrol edip tekrar deneyin.",
+  "retry": "Tekrar dene",
+  "invalidQrCode": "QR kodu geçersiz.",
+  "qrUserNotFound": "Kullanıcı bulunamadı.",
+  "qrLookupFailed": "QR kodu doğrulanamadı.",
+  "qrUserFound": "Kullanıcı bulundu",
+  "scanAgain": "Başka bir QR kodu tara",
+  "qrVerifying": "Doğrulanıyor...",
+  "qrScannerHint": "WiFi Mouni QR kodunu çerçevenin içine yerleştirin."
 }

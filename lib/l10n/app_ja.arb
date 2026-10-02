@@ -98,5 +98,19 @@
   "otpSendFailed": "SMSコードを送信できませんでした。",
   "phoneAlreadyInUse": "この電話番号はすでに別のアカウントに登録されています。",
   "passwordResetSuccess": "パスワードを変更しました。",
-  "passwordResetFailed": "パスワードを再設定できませんでした。"
+  "passwordResetFailed": "パスワードを再設定できませんでした。",
+  "contactByEmail": "メールでサポートに問い合わせ",
+  "contactViaWhatsApp": "WhatsAppでサポートに問い合わせ",
+  "emailLaunchFailed": "メールアプリを開けませんでした。",
+  "whatsappLaunchFailed": "WhatsAppを開けませんでした。",
+  "cameraPermissionDenied": "QRコードをスキャンするには、設定でカメラへのアクセスを許可してください。",
+  "cameraUnavailable": "カメラを利用できません。権限を確認して再試行してください。",
+  "retry": "再試行",
+  "invalidQrCode": "QRコードが無効です。",
+  "qrUserNotFound": "ユーザーが見つかりません。",
+  "qrLookupFailed": "QRコードを確認できませんでした。",
+  "qrUserFound": "ユーザーが見つかりました",
+  "scanAgain": "別のQRコードをスキャン",
+  "qrVerifying": "確認中...",
+  "qrScannerHint": "WiFi MouniのQRコードを枠内に合わせてください。"
 }

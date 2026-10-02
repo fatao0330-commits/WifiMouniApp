@@ -98,5 +98,19 @@
   "otpSendFailed": "تعذر إرسال رمز SMS.",
   "phoneAlreadyInUse": "هذا الرقم مرتبط بحساب آخر بالفعل.",
   "passwordResetSuccess": "تم تغيير كلمة المرور.",
-  "passwordResetFailed": "تعذرت إعادة تعيين كلمة المرور."
+  "passwordResetFailed": "تعذرت إعادة تعيين كلمة المرور.",
+  "contactByEmail": "مراسلة الدعم عبر البريد الإلكتروني",
+  "contactViaWhatsApp": "التواصل مع الدعم عبر WhatsApp",
+  "emailLaunchFailed": "تعذر فتح تطبيق البريد الإلكتروني.",
+  "whatsappLaunchFailed": "تعذر فتح WhatsApp.",
+  "cameraPermissionDenied": "اسمح بالوصول إلى الكاميرا من الإعدادات لمسح رمز QR.",
+  "cameraUnavailable": "الكاميرا غير متاحة. تحقق من الأذونات ثم حاول مجددًا.",
+  "retry": "إعادة المحاولة",
+  "invalidQrCode": "رمز QR غير صالح.",
+  "qrUserNotFound": "لم يتم العثور على المستخدم.",
+  "qrLookupFailed": "تعذر التحقق من رمز QR.",
+  "qrUserFound": "تم العثور على المستخدم",
+  "scanAgain": "مسح رمز QR آخر",
+  "qrVerifying": "جارٍ التحقق...",
+  "qrScannerHint": "ضع رمز WiFi Mouni QR داخل الإطار."
 }

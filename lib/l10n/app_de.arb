@@ -98,5 +98,19 @@
   "otpSendFailed": "SMS-Code konnte nicht gesendet werden.",
   "phoneAlreadyInUse": "Diese Nummer ist bereits mit einem anderen Konto verknüpft.",
   "passwordResetSuccess": "Dein Passwort wurde geändert.",
-  "passwordResetFailed": "Das Passwort konnte nicht zurückgesetzt werden."
+  "passwordResetFailed": "Das Passwort konnte nicht zurückgesetzt werden.",
+  "contactByEmail": "Support per E-Mail kontaktieren",
+  "contactViaWhatsApp": "Support über WhatsApp kontaktieren",
+  "emailLaunchFailed": "Die E-Mail-App konnte nicht geöffnet werden.",
+  "whatsappLaunchFailed": "WhatsApp konnte nicht geöffnet werden.",
+  "cameraPermissionDenied": "Erlaube den Kamerazugriff in den Einstellungen, um einen QR-Code zu scannen.",
+  "cameraUnavailable": "Die Kamera ist nicht verfügbar. Prüfe die Berechtigungen und versuche es erneut.",
+  "retry": "Erneut versuchen",
+  "invalidQrCode": "Ungültiger QR-Code.",
+  "qrUserNotFound": "Benutzer nicht gefunden.",
+  "qrLookupFailed": "Der QR-Code konnte nicht überprüft werden.",
+  "qrUserFound": "Benutzer gefunden",
+  "scanAgain": "Weiteren QR-Code scannen",
+  "qrVerifying": "Wird überprüft...",
+  "qrScannerHint": "Halte den WiFi-Mouni-QR-Code in den Rahmen."
 }
