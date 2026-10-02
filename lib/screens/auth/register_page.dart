@@ -776,7 +776,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             },
 
                   child:
-                      const Text(
+                      Text(
                     strings.signIn,
 
                     style:

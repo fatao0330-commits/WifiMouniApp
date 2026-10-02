@@ -5,7 +5,9 @@ import '../l10n/app_localizations.dart';
 import 'settings_service.dart';
 
 class AppSettingsController extends ChangeNotifier {
-  static const supportedLanguageCodes = AppLocalizations.supportedLanguageCodes;
+  static List<String> get supportedLanguageCodes => AppLocalizations.supportedLocales
+      .map((locale) => locale.languageCode)
+      .toList();
   AppSettingsController({required String language, required bool darkMode, required bool notifications})
       : _language = _normalizeLanguage(language),
         _darkMode = darkMode,
