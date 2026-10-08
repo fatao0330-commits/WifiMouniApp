@@ -3,9 +3,7 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/https");
 
-const {
-  defineSecret,
-} = require("firebase-functions/params");
+const {defineSecret} = require("firebase-functions/params");
 
 const admin = require("firebase-admin");
 const crypto = require("crypto");
@@ -20,21 +18,22 @@ const db = admin.firestore();
 |--------------------------------------------------------------------------
 */
 
-const INFOBIP_API_KEY =
-  defineSecret("INFOBIP_API_KEY");
+const infobipApiKey = defineSecret("INFOBIP_API_KEY");
+const infobipAppId = defineSecret("INFOBIP_APPLICATION_ID");
+const infobipMsgId = defineSecret("INFOBIP_MESSAGE_ID");
+const infobipSender = defineSecret("INFOBIP_SENDER");
+const yengaPayApiKey = defineSecret("YENGAPAY_API_KEY");
+
+const INFOBIP_SECRETS = [
+  infobipApiKey,
+  infobipAppId,
+  infobipMsgId,
+  infobipSender,
+];
+const RESET_SECRETS = [...INFOBIP_SECRETS, yengaPayApiKey];
 
 const INFOBIP_BASE_URL =
   "https://z49yk3.api.infobip.com";
-
-const INFOBIP_APPLICATION_ID =
-  "919DF1FB856227F581F1D243B2D8B365";
-
-const INFOBIP_MESSAGE_ID =
-  "D6666919D318A28A31C60A048D8E5FB1";
-
-const INFOBIP_SENDER =
-  "WiFiMouni";
-
 
 /*
 |--------------------------------------------------------------------------
@@ -164,7 +163,7 @@ async function infobipRequest(
   options = {},
 ) {
   const apiKey =
-    INFOBIP_API_KEY.value();
+    infobipApiKey.value();
 
   if (!apiKey) {
     throw new Error(
@@ -282,7 +281,7 @@ async function findUserByTelephone(phone, identifier) {
 exports.requestPasswordReset = onCall(
   {
     region: "us-central1",
-    secrets: [INFOBIP_API_KEY],
+    secrets: RESET_SECRETS,
   },
   async (request) => {
     try {
@@ -310,9 +309,9 @@ exports.requestPasswordReset = onCall(
         {
           method: "POST",
           body: {
-            applicationId: INFOBIP_APPLICATION_ID,
-            messageId: INFOBIP_MESSAGE_ID,
-            from: INFOBIP_SENDER,
+            applicationId: infobipAppId.value(),
+            messageId: infobipMsgId.value(),
+            from: infobipSender.value(),
             to: phone,
           },
         },
@@ -354,7 +353,7 @@ exports.requestPasswordReset = onCall(
 exports.verifyPasswordResetCode = onCall(
   {
     region: "us-central1",
-    secrets: [INFOBIP_API_KEY],
+    secrets: RESET_SECRETS,
   },
   async (request) => {
     try {
@@ -445,7 +444,7 @@ exports.verifyPasswordResetCode = onCall(
 
 
 exports.resetPasswordByPhone = onCall(
-  {region: "us-central1"},
+  {region: "us-central1", secrets: RESET_SECRETS},
   async (request) => {
     try {
       const phone = normalizePhone(getIdentifier(request.data));
@@ -526,7 +525,7 @@ exports.resetPasswordByPhone = onCall(
 exports.requestPinReset = onCall(
   {
     region: "us-central1",
-    secrets: [INFOBIP_API_KEY],
+    secrets: INFOBIP_SECRETS,
   },
 
   async (request) => {
@@ -595,13 +594,13 @@ exports.requestPinReset = onCall(
 
             body: {
               applicationId:
-                INFOBIP_APPLICATION_ID,
+                infobipAppId.value(),
 
               messageId:
-                INFOBIP_MESSAGE_ID,
+                infobipMsgId.value(),
 
               from:
-                INFOBIP_SENDER,
+                infobipSender.value(),
 
               to:
                 phone,
@@ -745,7 +744,7 @@ function maskPhone(phone) {
 exports.verifyPinResetCode = onCall(
   {
     region: "us-central1",
-    secrets: [INFOBIP_API_KEY],
+    secrets: INFOBIP_SECRETS,
   },
 
   async (request) => {
