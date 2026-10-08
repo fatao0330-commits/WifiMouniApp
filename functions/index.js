@@ -3,7 +3,8 @@ const {
   HttpsError,
 } = require("firebase-functions/v2/https");
 
-const {defineSecret} = require("firebase-functions/params");
+const {onDocumentCreated} = require("firebase-functions/v2/firestore");
+const {defineSecret, defineString} = require("firebase-functions/params");
 
 const admin = require("firebase-admin");
 const crypto = require("crypto");
@@ -23,6 +24,12 @@ const infobipAppId = defineSecret("INFOBIP_APPLICATION_ID");
 const infobipMsgId = defineSecret("INFOBIP_MESSAGE_ID");
 const infobipSender = defineSecret("INFOBIP_SENDER");
 const yengaPayApiKey = defineSecret("YENGAPAY_API_KEY");
+const yengaPayOrganizationId = defineString("YENGAPAY_ORGANIZATION_ID", {
+  default: "10905060",
+});
+const yengaPayEnvironment = defineString("YENGAPAY_ENVIRONMENT", {
+  default: "sandbox",
+});
 
 const INFOBIP_SECRETS = [
   infobipApiKey,
@@ -30,7 +37,8 @@ const INFOBIP_SECRETS = [
   infobipMsgId,
   infobipSender,
 ];
-const RESET_SECRETS = [...INFOBIP_SECRETS, yengaPayApiKey];
+const RESET_SECRETS = INFOBIP_SECRETS;
+const YENGAPAY_SECRETS = [yengaPayApiKey];
 
 const INFOBIP_BASE_URL =
   "https://z49yk3.api.infobip.com";
@@ -270,6 +278,208 @@ async function findUserByTelephone(phone, identifier) {
   }
   return null;
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| TRAITER UNE DEMANDE DE RECHARGE YENGAPAY
+|--------------------------------------------------------------------------
+*/
+
+exports.processRechargeRequest = onDocumentCreated(
+  {
+    document: "recharge_requests/{requestId}",
+    region: "us-central1",
+    secrets: YENGAPAY_SECRETS,
+    retry: true,
+  },
+  async (event) => {
+    const requestSnapshot = event.data;
+    if (!requestSnapshot) return;
+
+    const requestRef = requestSnapshot.ref;
+    const requestId = event.params.requestId;
+
+    let claimed;
+    try {
+      claimed = await db.runTransaction(async (transaction) => {
+        const current = await transaction.get(requestRef);
+        if (!current.exists || current.get("status") !== "pending") {
+          return false;
+        }
+
+        transaction.update(requestRef, {
+          status: "processing",
+          processingAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        return true;
+      });
+    } catch (error) {
+      console.error("YengaPay could not claim recharge request", {
+        requestId,
+        errorCode: error?.code || "claim_failed",
+      });
+      throw error;
+    }
+
+    if (!claimed) return;
+
+    try {
+      const recharge = requestSnapshot.data();
+      const amount = recharge.amount;
+      const currency = String(recharge.currency || "").trim().toUpperCase();
+      const paymentMethodId = String(recharge.paymentMethod || "").trim();
+
+      if (!Number.isSafeInteger(amount) || amount <= 0) {
+        throw Object.assign(new Error("invalid_amount"), {code: "invalid_amount"});
+      }
+      if (currency !== "XOF") {
+        throw Object.assign(new Error("unsupported_currency"), {code: "unsupported_currency"});
+      }
+      if (!paymentMethodId) {
+        throw Object.assign(new Error("missing_payment_method"), {code: "missing_payment_method"});
+      }
+
+      const paymentMethodSnapshot = await db
+        .collection("payment_methods")
+        .doc(paymentMethodId)
+        .get();
+      if (!paymentMethodSnapshot.exists) {
+        throw Object.assign(new Error("payment_method_not_found"), {code: "payment_method_not_found"});
+      }
+      const userUid = String(recharge.userUid || recharge.userId || "").trim();
+      if (!userUid || recharge.userId !== userUid || recharge.userUid !== userUid) {
+        throw Object.assign(new Error("invalid_recharge_owner"), {code: "invalid_recharge_owner"});
+      }
+
+      const userSnapshot = await db.collection("users").doc(userUid).get();
+      const userData = userSnapshot.data();
+      const verifiedPhone = normalizePhone(userData?.telephone);
+      if (!userSnapshot.exists || userData?.phoneVerified !== true || !verifiedPhone) {
+        throw Object.assign(new Error("customer_number_not_verified"), {
+          code: "customer_number_not_verified",
+        });
+      }
+      const requestedCustomerNumber = recharge.customerNumber == null ?
+        verifiedPhone :
+        normalizePhone(String(recharge.customerNumber).trim());
+      if (!requestedCustomerNumber || requestedCustomerNumber !== verifiedPhone) {
+        throw Object.assign(new Error("customer_number_not_verified"), {
+          code: "customer_number_not_verified",
+        });
+      }
+      const customerNumber = verifiedPhone;
+
+      const paymentMethod = paymentMethodSnapshot.data();
+      const isActive = paymentMethod.actif ?? paymentMethod.enabled ?? true;
+      if (isActive !== true) {
+        throw Object.assign(new Error("payment_method_disabled"), {code: "payment_method_disabled"});
+      }
+
+      const rawPaymentSource = String(
+        paymentMethod.paymentSource ||
+          paymentMethod.provider ||
+          paymentMethod.slug ||
+          paymentMethodId,
+      ).trim().toLowerCase();
+      const paymentSource = rawPaymentSource.replace(/[\s-]+/g, "_");
+      if (!/^[a-z][a-z0-9_]{1,49}$/.test(paymentSource)) {
+        throw Object.assign(new Error("invalid_payment_source"), {code: "invalid_payment_source"});
+      }
+
+      const environment = yengaPayEnvironment.value().trim().toLowerCase();
+      const baseUrlByEnvironment = {
+        sandbox: "https://yengapay.com",
+        production: "https://yengapay.com",
+      };
+      const baseUrl = baseUrlByEnvironment[environment];
+      const organizationId = yengaPayOrganizationId.value().trim();
+      const apiKey = yengaPayApiKey.value();
+
+      if (!baseUrl || !organizationId || !apiKey) {
+        throw Object.assign(new Error("yengapay_configuration_missing"), {
+          code: "yengapay_configuration_missing",
+        });
+      }
+
+      const endpoint =
+        `${baseUrl}/api/v1/organizations/${encodeURIComponent(organizationId)}` +
+        "/payment-intent";
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "x-api-key": apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paymentAmount: amount,
+          currency: "XOF",
+          customerNumber,
+          paymentSource,
+          reference: requestId,
+        }),
+        signal: AbortSignal.timeout(20000),
+      });
+
+      const responseText = await response.text();
+      let result = {};
+      try {
+        result = responseText ? JSON.parse(responseText) : {};
+      } catch (_) {
+        result = {};
+      }
+
+      const providerStatus = String(
+        result.status || result.data?.status || result.paymentIntent?.status || "",
+      ).trim().toLowerCase();
+
+      if (!response.ok) {
+        throw Object.assign(new Error("yengapay_payment_failed"), {
+          code: `yengapay_http_${response.status}`,
+        });
+      }
+
+      const successfulStatuses = ["success", "succeeded", "completed", "paid"];
+      const failedStatuses = ["failed", "failure", "rejected", "cancelled", "canceled", "error"];
+      const paymentStatus = successfulStatuses.includes(providerStatus) ?
+        "success" :
+        failedStatuses.includes(providerStatus) ? "failed" : "pending";
+      const providerReference = String(
+        result.transactionId || result.paymentIntentId || result.id ||
+          result.data?.transactionId || result.data?.paymentIntentId ||
+          result.data?.id || "",
+      );
+
+      await requestRef.update({
+        status: paymentStatus,
+        paymentProvider: "yengapay",
+        paymentProviderStatus: providerStatus,
+        paymentProviderReference: providerReference,
+        processedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (error) {
+      const failureCode = String(error?.code || "yengapay_payment_failed")
+        .replace(/[^a-zA-Z0-9_-]/g, "_")
+        .slice(0, 80);
+      try {
+        await requestRef.update({
+          status: "failed",
+          paymentProvider: "yengapay",
+          failureCode,
+          processedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      } catch (updateError) {
+        console.error("YengaPay failure status could not be saved", {
+          requestId,
+          errorCode: updateError?.code || "firestore_update_failed",
+        });
+        throw updateError;
+      }
+
+      console.error("YengaPay recharge failed", {requestId, failureCode});
+    }
+  },
+);
 
 
 /*

@@ -34,8 +34,14 @@ service cloud.firestore {
         && request.resource.data.processedAt == null
         && request.resource.data.amount is int
         && request.resource.data.amount > 0
+        && request.resource.data.amount >= get(/databases/$(database)/documents/settings/recharge).data.minimumAmount
+        && request.resource.data.amount <= get(/databases/$(database)/documents/settings/recharge).data.maximumAmount
         && request.resource.data.reference is string
-        && request.resource.data.reference.size() > 0;
+        && request.resource.data.reference.size() > 0
+        && request.resource.data.paymentMethod is string
+        && request.resource.data.paymentMethod.size() > 0
+        && request.resource.data.customerNumber is string
+        && request.resource.data.customerNumber.size() > 0;
       allow read: if signedIn() && resource.data.userUid == request.auth.uid;
       allow update, delete: if false;
     }

@@ -4,6 +4,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'firebase_options.dart';
 import 'l10n/app_localizations.dart';
+import 'localization.dart' as legacy_localizations;
 
 import 'screens/auth/login_page.dart';
 
@@ -147,6 +148,7 @@ class _WiFiMouniAppState extends State<WiFiMouniApp> {
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
+        legacy_localizations.AppLocalizations.delegate,
       ],
 
       // ========================================================
